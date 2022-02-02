@@ -1,7 +1,7 @@
 #include "mathlib.hpp"
 #include "math.h"
 
-float Vec3::GetMagnitude();
+float Vec3::GetMagnitude()
 {
     return sqrt(pow(x,2)+pow(y,2)+pow(z,2));
 }
