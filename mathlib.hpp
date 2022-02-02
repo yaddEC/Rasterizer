@@ -3,49 +3,49 @@
 class Vec3
 {
 public:
+    Vec3();
+    Vec3(float a, float b, float c);
     float x;
     float y;
     float z;
 
     float GetMagnitude();
     void Normalize();
-    Vec3 operator+ ( const Vec3& rhs);
-    Vec3 operator* ( const float& rhs);
-    
+    Vec3 operator+(const Vec3 &rhs);
+    Vec3 operator*(const float &rhs);
+    ~Vec3();
 };
 
 class Vec4
 {
 public:
+    Vec4();
+    Vec4(float a, float b, float c, float d);
     float x;
     float y;
     float z;
     float w;
 
-  
     void Homogenize();
     float GetMagnitude();
     void Normalize();
-    Vec4 operator+ ( const Vec4& rhs);
-    Vec4 operator* ( const float& rhs);
-    Vec4(const Vec3& vec3, float _w = 1.0f);
+    Vec4 operator+(const Vec4 &rhs);
+    Vec4 operator*(const float &rhs);
+    Vec4(const Vec3 &vec3, float _w = 1.0f);
     ~Vec4();
-
 };
 
 class Mat4
 {
 public:
+    Mat4();
     float mat[16];
     void Homogenize();
     void Normalize();
-    Mat4(const float(& arr)[16]);
-    Mat4 operator* ( const Vec4& rhs);
-    Mat4 operator* ( const Mat4& rhs);
-    static Mat4 CreateTransformMatrix(const Vec3& rotation, const Vec3& position, const Vec3& scale);
+    Mat4(const float (&arr)[16]);
+    Vec4 operator*(const Vec4 &rhs);
+    Mat4 operator*(const Mat4 &rhs);
+    static Mat4 CreateTransformMatrix(const Vec3 &rotation, const Vec3 &position, const Vec3 &scale);
 
     ~Mat4();
-
 };
-
-
