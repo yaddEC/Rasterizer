@@ -1,4 +1,5 @@
 #pragma once
+#include "stdio.h"
 
 class Vec3
 {
@@ -26,6 +27,7 @@ public:
     float z;
     float w;
 
+    void Print();
     void Homogenize();
     float GetMagnitude();
     void Normalize();
@@ -40,8 +42,7 @@ class Mat4
 public:
     Mat4();
     float mat[16];
-    void Homogenize();
-    void Normalize();
+    void Print();
     Mat4(const float (&arr)[16]);
     Vec4 operator*(const Vec4 &rhs);
     Mat4 operator*(const Mat4 &rhs);
