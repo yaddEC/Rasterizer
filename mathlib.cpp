@@ -71,3 +71,15 @@ Vec4::~Vec4()
 {
     
 }
+
+
+Mat4::Mat4(const float(& arr)[16])
+{
+   for(int i=0; i<16;i++)
+   {
+       mat[i]=arr[i];
+   }
+}
+
+
+

@@ -22,12 +22,13 @@ public:
     float z;
     float w;
 
-    Vec4(const Vec3& vec3, float _w = 1.0f);
+  
     void Homogenize();
     float GetMagnitude();
     void Normalize();
     Vec4 operator+ ( const Vec4& rhs);
     Vec4 operator* ( const float& rhs);
+    Vec4(const Vec3& vec3, float _w = 1.0f);
     ~Vec4();
 
 };
@@ -35,10 +36,10 @@ public:
 class Mat4
 {
 public:
-    float mat[4][4];
-    Mat4();
+    float mat[16];
     void Homogenize();
     void Normalize();
+    Mat4(const float(& arr)[16]);
     Mat4 operator* ( const Vec4& rhs);
     Mat4 operator* ( const Mat4& rhs);
     static Mat4 CreateTransformMatrix(const Vec3& rotation, const Vec3& position, const Vec3& scale);
