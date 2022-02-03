@@ -46,7 +46,24 @@ public:
     Mat4(const float (&arr)[16]);
     Vec4 operator*(const Vec4 &rhs);
     Mat4 operator*(const Mat4 &rhs);
-    static Mat4 CreateTransformMatrix(const Vec3 &rotation, const Vec3 &position, const Vec3 &scale);
+    static Mat4 CreateTransformMatrix(const Vec3& rotation, const Vec3& position, const Vec3& scale);
+    static Mat4 CreateTranslationMatrix(const Vec3 &translation);
+    static Mat4 CreateScaleMatrix(const Vec3 &scale);
+    static Mat4 CreateXRotationMatrix(float angle);
+    static Mat4 CreateYRotationMatrix(float angle);
+    static Mat4 CreateZRotationMatrix(float angle);
+    /*  rotX()
+    {
+        matrix4 = { 1 0 0  0
+                    0 c -s 0
+                    0 s c  0
+                    0 0 0 1}
 
+        matrix4 * *this;
+    } */
     ~Mat4();
 };
+
+/* Matrix4 myMax;
+
+Matrix4 newMat = myMax.rotX(90); */

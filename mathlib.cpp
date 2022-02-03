@@ -1,7 +1,6 @@
 #include "mathlib.hpp"
 #include "math.h"
 
-
 Vec3::Vec3()
 {
     x = 0;
@@ -47,7 +46,7 @@ Vec4::Vec4()
     x = 0;
     y = 0;
     z = 0;
-    w=0;
+    w = 0;
 }
 
 Vec4::Vec4(float a, float b, float c, float d)
@@ -78,7 +77,7 @@ void Vec4::Homogenize()
 
 void Vec4::Print()
 {
-   printf("\n|%f|%f|%f|%f|\n\n",x,y,z,w);
+    printf("\n|%f|%f|%f|%f|\n\n", x, y, z, w);
 }
 
 float Vec4::GetMagnitude()
@@ -110,9 +109,10 @@ Vec4 Vec4::operator*(const float &rhs)
 Vec4::~Vec4()
 {
 }
+
 Mat4::Mat4()
 {
-        for (int i = 0; i < 16; i++)
+    for (int i = 0; i < 16; i++)
     {
         mat[i] = 0;
     }
@@ -124,14 +124,13 @@ void Mat4::Print()
     printf("-------------------------\n");
     for (int i = 0; i < 16; i++)
     {
-        if(i%4==0)
-        printf("|");
+        if (i % 4 == 0)
+            printf("|");
 
         printf(" %d ", (int)mat[i]);
         printf("|");
-        if(i%4==3)
-        printf("\n-------------------------\n");
-      
+        if (i % 4 == 3)
+            printf("\n-------------------------\n");
     }
     printf("\n");
 }
@@ -178,6 +177,67 @@ Vec4 Mat4::operator*(const Vec4 &rhs)
     temp.z = mat[8] * rhs.x + mat[9] * rhs.y + mat[10] * rhs.z + mat[11] * rhs.w;
     temp.w = mat[12] * rhs.x + mat[13] * rhs.y + mat[14] * rhs.z + mat[15] * rhs.w;
     return temp;
+}
+
+Mat4 Mat4::CreateTranslationMatrix(const Vec3 &translation)
+{
+    float array[16] =
+        {
+            1, 0, 0, translation.x,
+            0, 1, 0, translation.y,
+            0, 0, 1, translation.z,
+            0, 0, 0, 1};
+    Mat4 temp = array;
+    return temp;
+}
+Mat4 Mat4::CreateScaleMatrix(const Vec3 &scale)
+{
+    float array[16] =
+        {
+            scale.x, 0, 0, 0,
+            0, scale.y, 0, 0,
+            0, 0, scale.z, 0,
+            0, 0, 0, 1};
+    Mat4 temp = array;
+    return temp;
+}
+Mat4 Mat4::CreateXRotationMatrix(float angle)
+{
+    float array[16] =
+        {
+            1, 0, 0, 0,
+            0, cos(angle), sin(angle), 0,
+            0, -sin(angle), cos(angle), 0,
+            0, 0, 0, 1};
+    Mat4 temp = array;
+    return temp;
+}
+Mat4 Mat4::CreateYRotationMatrix(float angle)
+{
+    float array[16] =
+        {
+            cos(angle), 0, -sin(angle), 0,
+            0, 1, 0, 0,
+            sin(angle), 0, cos(angle), 0,
+            0, 0, 0, 1};
+    Mat4 temp = array;
+    return temp;
+}
+Mat4 Mat4::CreateZRotationMatrix(float angle)
+{
+    float array[16] =
+        {
+            cos(angle), -sin(angle), 0, 0,
+            sin(angle), cos(angle), 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1};
+    Mat4 temp = array;
+    return temp;
+}
+Mat4 Mat4::CreateTransformMatrix(const Vec3& rotation, const Vec3& position, const Vec3& scale)
+{
+    return CreateXRotationMatrix(rotation.x)*CreateYRotationMatrix(rotation.y)*CreateZRotationMatrix(rotation.z)*CreateScaleMatrix(scale)*CreateTranslationMatrix(position);
+
 }
 Mat4::~Mat4()
 {

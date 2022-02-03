@@ -44,6 +44,7 @@ int main()
 
   Vec4 test8 = test5*test4;
   test4.Print();
+
   test8.Print();
 
     
