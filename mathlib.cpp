@@ -148,25 +148,17 @@ Mat4::Mat4(const float (&arr)[16])
 Mat4 Mat4::operator*(const Mat4 &rhs)
 {
     Mat4 temp;
-    temp.mat[0] = mat[0] * rhs.mat[0] + mat[1] * rhs.mat[4] + mat[2] * rhs.mat[8] + mat[3] * rhs.mat[12];
-    temp.mat[1] = mat[0] * rhs.mat[1] + mat[1] * rhs.mat[5] + mat[2] * rhs.mat[9] + mat[3] * rhs.mat[13];
-    temp.mat[2] = mat[0] * rhs.mat[2] + mat[1] * rhs.mat[6] + mat[2] * rhs.mat[10] + mat[3] * rhs.mat[14];
-    temp.mat[3] = mat[0] * rhs.mat[3] + mat[1] * rhs.mat[7] + mat[2] * rhs.mat[11] + mat[3] * rhs.mat[15];
 
-    temp.mat[4] = mat[4] * rhs.mat[0] + mat[5] * rhs.mat[4] + mat[6] * rhs.mat[8] + mat[7] * rhs.mat[12];
-    temp.mat[5] = mat[4] * rhs.mat[1] + mat[5] * rhs.mat[5] + mat[6] * rhs.mat[9] + mat[7] * rhs.mat[13];
-    temp.mat[6] = mat[4] * rhs.mat[2] + mat[5] * rhs.mat[6] + mat[6] * rhs.mat[10] + mat[7] * rhs.mat[14];
-    temp.mat[7] = mat[4] * rhs.mat[3] + mat[5] * rhs.mat[7] + mat[6] * rhs.mat[11] + mat[7] * rhs.mat[15];
-
-    temp.mat[8] = mat[8] * rhs.mat[0] + mat[9] * rhs.mat[4] + mat[10] * rhs.mat[8] + mat[11] * rhs.mat[12];
-    temp.mat[9] = mat[8] * rhs.mat[1] + mat[9] * rhs.mat[5] + mat[10] * rhs.mat[9] + mat[11] * rhs.mat[13];
-    temp.mat[10] = mat[8] * rhs.mat[2] + mat[9] * rhs.mat[6] + mat[10] * rhs.mat[10] + mat[11] * rhs.mat[14];
-    temp.mat[11] = mat[8] * rhs.mat[3] + mat[9] * rhs.mat[7] + mat[10] * rhs.mat[11] + mat[11] * rhs.mat[15];
-
-    temp.mat[12] = mat[12] * rhs.mat[0] + mat[13] * rhs.mat[4] + mat[14] * rhs.mat[8] + mat[15] * rhs.mat[12];
-    temp.mat[13] = mat[12] * rhs.mat[1] + mat[13] * rhs.mat[5] + mat[14] * rhs.mat[9] + mat[15] * rhs.mat[13];
-    temp.mat[14] = mat[12] * rhs.mat[2] + mat[13] * rhs.mat[6] + mat[14] * rhs.mat[10] + mat[15] * rhs.mat[14];
-    temp.mat[15] = mat[12] * rhs.mat[3] + mat[13] * rhs.mat[7] + mat[14] * rhs.mat[11] + mat[15] * rhs.mat[15];
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                temp.mat[i*4+j] += mat[i*4+k] * rhs.mat[k*4+j];
+            }
+        }
+    }
 
     return temp;
 }
