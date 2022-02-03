@@ -52,6 +52,7 @@ public:
     static Mat4 CreateXRotationMatrix(float angle);
     static Mat4 CreateYRotationMatrix(float angle);
     static Mat4 CreateZRotationMatrix(float angle);
+    void TransposeMatrix(const int M,const int N);
     /*  rotX()
     {
         matrix4 = { 1 0 0  0

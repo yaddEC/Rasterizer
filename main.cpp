@@ -40,13 +40,14 @@ int main()
   Mat4 test6 =array2;
   Mat4 test7 = test5*test6;
   test7.Print();
-
+  test7.TransposeMatrix(4,4);
+  test7.Print();
 
   Vec4 test8 = test5*test4;
   test4.Print();
 
   test8.Print();
-
+  
     
     
 

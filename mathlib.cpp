@@ -143,6 +143,8 @@ Mat4::Mat4(const float (&arr)[16])
     }
 }
 
+
+
 Mat4 Mat4::operator*(const Mat4 &rhs)
 {
     Mat4 temp;
@@ -239,6 +241,22 @@ Mat4 Mat4::CreateTransformMatrix(const Vec3& rotation, const Vec3& position, con
     return CreateXRotationMatrix(rotation.x)*CreateYRotationMatrix(rotation.y)*CreateZRotationMatrix(rotation.z)*CreateScaleMatrix(scale)*CreateTranslationMatrix(position);
 
 }
+
+void Mat4::TransposeMatrix(const int M,const int N) {
+   
+   Mat4 temp = mat;
+    for (int i = 0; i < M; ++i )
+    {
+       for (int j = 0; j < N; ++j )
+       {
+          int index = i*N+j;
+          int index2 = j*M+i;
+          mat[index2] = temp.mat[index];
+       }
+    }
+}
+
 Mat4::~Mat4()
 {
 }
+
