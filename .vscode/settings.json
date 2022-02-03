@@ -1,7 +1,8 @@
 {
     "files.associations": {
-        "limits": "cpp",
-        "type_traits": "cpp",
-        "cmath": "cpp"
+        "*.rh": "cpp",
+        "xiosbase": "cpp",
+        "glad.h": "c",
+        "vector": "cpp"
     }
 }
