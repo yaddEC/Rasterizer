@@ -32,7 +32,7 @@ private:
     Framebuffer* fb;
     Viewport viewport;
 
-    float4 lineColor = { 1.f, 1.f, 1.f, 1.f };
+    Vec4 lineColor = { 1.f, 1.f, 1.f, 1.f };
 
 public:
 // Color and depth buffer have to be valid until the shutdown of the renderer
@@ -48,7 +48,7 @@ public:
     void SetModel(float* p_modelMatrix);
     void SetViewport(const int p_x, const int p_y, const uint p_width, const uint p_height);
     void SetTexture(float* p_colors32Bits, const uint p_width, const uint p_height);
-    void DrawLine(const float3& p_0, const float3& p_1, const float4& p_color);
+    void DrawLine(const Vec3& p_0, const Vec3& p_1, const Vec4& p_color);
     void DrawTriangles(rdrVertex* p_vertices, const uint p_count);
     void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y, float4 p_color);
 

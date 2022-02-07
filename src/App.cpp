@@ -139,10 +139,10 @@ void App::Update()
         framebuffer.Clear();
 
         // Setup matrices
-        mat4x4 projection = camera.GetProjection();
-        mat4x4 view       = camera.GetViewMatrix();
-        renderer.SetProjection(projection.e);
-        renderer.SetView(view.e);
+        Mat4 projection = camera.GetProjection();
+        Mat4 view       = camera.GetViewMatrix();
+        renderer.SetProjection(projection.mat);
+        renderer.SetView(view.mat);
 
         // Render scene
         scene.Update(ImGui::GetIO().DeltaTime, renderer);
@@ -155,7 +155,7 @@ void App::Update()
         {
             if (ImGui::CollapsingHeader("Framebuffer", ImGuiTreeNodeFlags_DefaultOpen))
             {
-                ImGui::ColorEdit4("clearColor", framebuffer.clearColor.e);
+                ImGui::ColorEdit4("clearColor", &framebuffer.clearColor.x);
             }
             if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
             {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cmath>
-
+#include <mathlib.hpp>
 #include "types.hpp"
 
 //Remplacer par vos maths

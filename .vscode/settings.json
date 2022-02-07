@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "files.associations": {
         "limits": "cpp",
@@ -5,4 +6,13 @@
         "cmath": "cpp",
         "*.tcc": "cpp"
     }
+=======
+{
+    "files.associations": {
+        "*.rh": "cpp",
+        "xiosbase": "cpp",
+        "glad.h": "c",
+        "vector": "cpp"
+    }
+>>>>>>> 9bf647ec4afe00e9930352f13b1f3e16c788185a
 }
