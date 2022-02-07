@@ -10,7 +10,7 @@
 #include <Renderer.hpp>
 
 
-
+/*
 Renderer::Renderer(float* p_colorBuffer32Bits, float* p_depthBuffer, const uint p_width, const uint p_height):
 fb(p_width, p_height),viewport(0,0,p_width, p_height)
 {
@@ -18,10 +18,15 @@ fb(p_width, p_height),viewport(0,0,p_width, p_height)
     //fb.depthBuffer = p_depthBuffer;
 
 }
+*/
+Renderer::Renderer(Framebuffer* f,const uint p_width, const uint p_height):viewport(0,0,p_width, p_height)
+{
+    fb = f;
+}
 
 Renderer::~Renderer()
 {
-
+    
 }
 
 void Renderer::SetProjection(float* p_projectionMatrix)
@@ -49,18 +54,36 @@ void Renderer::SetTexture(float* p_colors32Bits, const uint p_width, const uint 
     // TODO
 }
 
-void DrawPixel(float4* p_colorBuffer, uint p_width, uint p_height, uint p_x, uint p_y, float4 p_color)
+void Renderer::DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y, float4 p_color)
 {
-    // TODO
+    float* colorBuffer = fb->GetColorBuffer();
+
+    colorBuffer[p_x + p_y*p_width *4] = p_color.r;
+    colorBuffer[p_x + p_y*p_width *4 + 1] = p_color.g;
+    colorBuffer[p_x + p_y*p_width *4 + 2] = p_color.b;
+    colorBuffer[p_x + p_y*p_width *4 + 3] = p_color.a;
 }
 void Renderer::DrawLine(const float3& p0, const float3& p1, const float4& color)
 {
-   //TODO
+   int m_new = 2 * (p1.y - p0.x);
+   int slope_error_new = m_new - (p1.x - p0.x);
+   for (int x = p0.x, y = p0.x; x <= p1.x; x++)
+   {
+      DrawPixel(800,600,x,y,color);
+      slope_error_new += m_new;
+      if (slope_error_new >= 0)
+      {
+         y++;
+         slope_error_new  -= 2 * (p1.x - p0.x);
+      }
+   }
 }
 
 float3 ndcToScreenCoords(float3 ndc, const Viewport& viewport)
 {
-    // TODO
+    ndc.x = viewport.x/2;
+    ndc.y = viewport.y/2;
+
     return ndc;
 }
 
@@ -97,10 +120,13 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
         { ndcToScreenCoords(ndcCoords[2], viewport) },
     };
 
-    // Draw triangle wireframe
+    // Draw triangle wireframe 
+    /*
     DrawLine(screenCoords[0], screenCoords[1], lineColor);
     DrawLine(screenCoords[1], screenCoords[2], lineColor);
     DrawLine(screenCoords[2], screenCoords[0], lineColor);
+    */
+    DrawLine({0,0,0},{300,300,0},{255,255,255,255});
 }
 
 void Renderer::DrawTriangles(rdrVertex* p_vertices, const uint p_count)
