@@ -26,7 +26,7 @@ public:
     float y;
     float z;
     float w;
-
+    
     void Print();
     void Homogenize();
     float GetMagnitude();
@@ -46,6 +46,7 @@ public:
     Mat4(const float (&arr)[16]);
     Vec4 operator*(const Vec4 &rhs);
     Mat4 operator*(const Mat4 &rhs);
+    static Mat4 identity();
     static Mat4 CreateTransformMatrix(const Vec3& rotation, const Vec3& position, const Vec3& scale);
     static Mat4 CreateTranslationMatrix(const Vec3 &translation);
     static Mat4 CreateScaleMatrix(const Vec3 &scale);

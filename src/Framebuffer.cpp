@@ -2,6 +2,7 @@
 
 #include <Framebuffer.hpp>
 
+
 Framebuffer::Framebuffer(int p_width, int p_height)
     : width(p_width)
     , height(p_height)
@@ -28,15 +29,15 @@ void Framebuffer::Clear()
 
     // Clear color buffer
     {
-        float4* colors = colorBuffer.data();
+        Vec4* colors = colorBuffer.data();
 
         // Fill the first line with the clear color
         for (std::size_t i = 0; i < width; ++i)
-            std::memcpy(&colors[i], &clearColor, sizeof(float4));
+            std::memcpy(&colors[i], &clearColor, sizeof(Vec4));
 
         // Copy the first line onto every line
         for (std::size_t i = 1; i < height; ++i)
-            std::memcpy(&colors[i * width], &colors[0], width * sizeof(float4));
+            std::memcpy(&colors[i * width], &colors[0], width * sizeof(Vec4));
     }
 
     // Clear depth buffer

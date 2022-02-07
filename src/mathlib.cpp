@@ -134,7 +134,21 @@ void Mat4::Print()
     }
     printf("\n");
 }
+Mat4 Mat4::identity()
+{
+    float array[16]
+    ={
+         
+        1.f, 0.f, 0.f, 0.f,
+        0.f, 1.f, 0.f, 0.f,
+        0.f, 0.f, 1.f, 0.f,
+        0.f, 0.f, 0.f, 1.f,
+        
+    };
 
+    Mat4 temp = array;
+    return temp;
+}
 Mat4::Mat4(const float (&arr)[16])
 {
     for (int i = 0; i < 16; i++)

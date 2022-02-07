@@ -16,16 +16,16 @@ void Camera::Update(const float p_deltaTime, const CameraInputs& inputs)
     //TODO
 }
 
-mat4x4 Camera::GetViewMatrix()
+Mat4 Camera::GetViewMatrix()
 {
     //TODO
-    return mat4::identity();
+    return Mat4::identity();
 }
 
-mat4x4 Camera::GetProjection()
+Mat4 Camera::GetProjection()
 {
     //TODO
-    return mat4::identity();
+    return Mat4::identity();
 }
 
 void Camera::ShowImGuiControls()
