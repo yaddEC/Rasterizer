@@ -212,7 +212,7 @@ Mat4 Mat4::CreateScaleMatrix(const Vec3 &scale)
             0, scale.y, 0, 0,
             0, 0, scale.z, 0,
             0, 0, 0, 1};
-    Mat4 temp = array;
+    Mat4 temp = array;  
     return temp;
 }
 Mat4::Mat4(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j, float k, float l, float m, float n, float o, float p)
@@ -260,7 +260,16 @@ Mat4 Mat4::CreateZRotationMatrix(float angle)
 }
 Mat4 Mat4::CreateTransformMatrix(const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
 {
-    return CreateXRotationMatrix(rotation.x) * CreateYRotationMatrix(rotation.y) * CreateZRotationMatrix(rotation.z) * CreateScaleMatrix(scale) * CreateTranslationMatrix(position);
+   /*   float array[16] = 
+    {
+        scale.x * cosf(rotation.y)*cosf(rotation.z),-sinf(rotation.z),sinf(rotation.z),position.x,
+        sinf(rotation.z),scale.y*cosf(rotation.x)*cosf(rotation.x),-sinf(rotation.z),position.y,
+        -sinf(rotation.y),sinf(rotation.x),scale.z*cosf(rotation.y)*cosf(rotation.x),position.z,
+        0,0,0,1
+    };
+    Mat4 temp = array;
+    return  temp ; */
+    return  CreateTranslationMatrix(position)* (CreateYRotationMatrix(rotation.y)*CreateXRotationMatrix(rotation.x)  * CreateZRotationMatrix(rotation.z)) * CreateScaleMatrix(scale) ;
 }
 
 void Mat4::TransposeMatrix(const int M, const int N)

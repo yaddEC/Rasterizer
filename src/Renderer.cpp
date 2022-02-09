@@ -79,15 +79,15 @@ void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
       }
    }
    */
-    int x0=p0.x, x1=p1.x, y0=p0.y, y1=p1.y;
+    int x0=p0.x*4, x1=p1.x*4, y0=p0.y, y1=p1.y;
     int dx =  abs(x1-x0), sx = x0<x1 ? 1 : -1;
     int dy = -abs(y1-y0), sy = y0<y1 ? 1 : -1; 
     int err = dx+dy, e2; 
 
     for(;;){  
-        DrawPixel(fb->GetHeight(),fb->GetWidth(),x0,y0,color);
+        DrawPixel(fb->GetWidth(),fb->GetHeight(),x0,y0,color);
         if (x0==x1 && y0==y1) break;
-        e2 = 2*err;
+        e2 =2*err;
         if (e2 >= dy) { err += dy; x0 += sx; } 
         if (e2 <= dx) { err += dx; y0 += sy; } 
     }
@@ -97,6 +97,9 @@ Vec3 ndcToScreenCoords(Vec3 ndc, const Viewport& viewport)
 {
     ndc.x = ndc.x*viewport.width+(viewport.width/2);
     ndc.y = ndc.y*viewport.height+(viewport.height/2);
+
+
+
 
     return ndc;
 }
@@ -119,7 +122,7 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
         { Vec4{ localCoords[2], 1.f } },
     };
 
-    Mat4 translate= translate.CreateTransformMatrix({0,0,0},{1,1,0},{60,60,0});
+    Mat4 translate= translate.CreateTransformMatrix({M_PI,0,0},{400,300,0},{400,400,0});
 
     clipCoords[0]=translate*clipCoords[0];
     clipCoords[1]=translate*clipCoords[1];
@@ -154,7 +157,7 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[2], ndcCoords[0], lineColor); 
     
-   //DrawLine({0,0,0},{300,300,0},{255,255,255,1});
+   DrawLine({0,0,0},{fb->GetWidth(),fb->GetHeight(),0},{255,255,255,1});
 }
 
 void Renderer::DrawTriangles(rdrVertex* p_vertices, const uint p_count)
