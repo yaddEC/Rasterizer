@@ -32,11 +32,11 @@ void Framebuffer::Clear()
         Vec4* colors = colorBuffer.data();
 
         // Fill the first line with the clear color
-        for (std::size_t i = 0; i < width; ++i)
+        for (int i = 0; i < width; ++i)
             std::memcpy(&colors[i], &clearColor, sizeof(Vec4));
 
         // Copy the first line onto every line
-        for (std::size_t i = 1; i < height; ++i)
+        for (int i = 1; i < height; ++i)
             std::memcpy(&colors[i * width], &colors[0], width * sizeof(Vec4));
     }
 

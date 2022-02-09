@@ -153,15 +153,13 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
     DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[2], ndcCoords[0], lineColor); 
-    
-   //DrawLine({0,0,0},{300,300,0},{255,255,255,1});
 }
 
 void Renderer::DrawTriangles(rdrVertex* p_vertices, const uint p_count)
 {
     // calculate mvp from matrices
     // Transform vertex list to triangles into colorBuffer
-    for (int i = 0; i < p_count; i += 3)
+    for (uint i = 0; i < p_count; i += 3)
     {
         DrawTriangle(&p_vertices[i]);
     }
