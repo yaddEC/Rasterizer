@@ -44,6 +44,7 @@ public:
     float mat[16];
     void Print();
     Mat4(const float (&arr)[16]);
+    Mat4(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j, float k, float l, float m, float n, float o, float p);
     Vec4 operator*(const Vec4 &rhs);
     Mat4 operator*(const Mat4 &rhs);
     static Mat4 identity();

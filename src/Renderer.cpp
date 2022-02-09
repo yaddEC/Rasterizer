@@ -85,7 +85,7 @@ void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
     int err = dx+dy, e2; 
 
     for(;;){  
-        DrawPixel(800,600,x0,y0,color);
+        DrawPixel(fb->GetHeight(),fb->GetWidth(),x0,y0,color);
         if (x0==x1 && y0==y1) break;
         e2 = 2*err;
         if (e2 >= dy) { err += dy; x0 += sx; } 
@@ -95,11 +95,12 @@ void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
 
 Vec3 ndcToScreenCoords(Vec3 ndc, const Viewport& viewport)
 {
-    ndc.x = viewport.x/2;
-    ndc.y = viewport.y/2;
+    ndc.x = ndc.x*viewport.width+(viewport.width/2);
+    ndc.y = ndc.y*viewport.height+(viewport.height/2);
 
     return ndc;
 }
+
 
 void Renderer::DrawTriangle(rdrVertex* vertices)
 {
@@ -111,20 +112,32 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     };
 
     // Local space (v3) -> Clip space (v4)
-    // TODO
+   
     Vec4 clipCoords[3] = {
         { Vec4{ localCoords[0], 1.f } },
         { Vec4{ localCoords[1], 1.f } },
         { Vec4{ localCoords[2], 1.f } },
     };
 
+    Mat4 translate= translate.CreateTransformMatrix({0,0,0},{1,1,0},{60,60,0});
+
+    clipCoords[0]=translate*clipCoords[0];
+    clipCoords[1]=translate*clipCoords[1];
+    clipCoords[2]=translate*clipCoords[2];
+    
+    
+     
+
+    
     // Clip space (v4) to NDC (v3)
     // TODO
     Vec3 ndcCoords[3] = {
-        { clipCoords[0].x,clipCoords[0].y,clipCoords[0].z },
-        {  clipCoords[1].x,clipCoords[1].y,clipCoords[1].z },
-        {  clipCoords[2].x,clipCoords[2].y,clipCoords[2].z},
+        { clipCoords[0].x/clipCoords[0].w,clipCoords[0].y/clipCoords[0].w,clipCoords[0].z/clipCoords[0].w },
+        {  clipCoords[1].x/clipCoords[1].w,clipCoords[1].y/clipCoords[1].w,clipCoords[1].z/clipCoords[1].w },
+        {  clipCoords[2].x/clipCoords[2].w,clipCoords[2].y/clipCoords[2].w,clipCoords[2].z/clipCoords[2].w},
     };
+
+
 
     // NDC (v3) to screen coords (v2)
     // TODO
@@ -134,13 +147,14 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
         { ndcToScreenCoords(ndcCoords[2], viewport) },
     };
 
+
     // Draw triangle wireframe 
-    /*
-    DrawLine(screenCoords[0], screenCoords[1], lineColor);
-    DrawLine(screenCoords[1], screenCoords[2], lineColor);
-    DrawLine(screenCoords[2], screenCoords[0], lineColor);
-    */
-    DrawLine({0,0,0},{300,300,0},{255,255,255,1});
+    
+    DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
+    DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
+    DrawLine(ndcCoords[2], ndcCoords[0], lineColor); 
+    
+   //DrawLine({0,0,0},{300,300,0},{255,255,255,1});
 }
 
 void Renderer::DrawTriangles(rdrVertex* p_vertices, const uint p_count)

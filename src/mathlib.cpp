@@ -215,6 +215,16 @@ Mat4 Mat4::CreateScaleMatrix(const Vec3 &scale)
     Mat4 temp = array;
     return temp;
 }
+Mat4::Mat4(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j, float k, float l, float m, float n, float o, float p)
+{
+    float arr[16] = {a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p};
+
+    for (int i = 0; i < 16; i++)
+    {
+        mat[i] = arr[i];
+    }
+}
+
 Mat4 Mat4::CreateXRotationMatrix(float angle)
 {
     float array[16] =

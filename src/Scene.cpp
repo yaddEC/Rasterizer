@@ -26,7 +26,7 @@ void Scene::Update(float deltaTime, Renderer& renderer)
 
     // Hard coded matrix
     // TODO: Remove this and use proper functions !
-    mat4x4 matrix = {
+    Mat4 matrix = {
         scale, 0.f, 0.f, 0.f,
         0.f, scale, 0.f, 0.f,
         0.f, 0.f, scale, 0.f,
@@ -34,7 +34,7 @@ void Scene::Update(float deltaTime, Renderer& renderer)
     };
 
 
-    renderer.SetModel(matrix.e);
+    renderer.SetModel(matrix.mat);
 
     // Draw
     renderer.DrawTriangles(vertices.data(), (int)vertices.size());

@@ -93,9 +93,9 @@ void App::Update()
 
     // Create renderer framebuffer (color+depth+opengl texture)
     // We need an OpenGL texture to display the result of the renderer to the screen
-    Framebuffer framebuffer(800, 600);
+    Framebuffer framebuffer(600, 600);
     // Init renderer
-    Renderer renderer(&framebuffer,800,600);
+    Renderer renderer(&framebuffer,600,600);
     Scene scene;
 
     CameraInputs inputs;
