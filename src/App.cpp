@@ -120,7 +120,7 @@ void App::Update()
         }
 
         // Update camera
-        if (ImGui::IsKeyPressed(GLFW_KEY_ENTER))
+        if (ImGui::IsKeyPressed(GLFW_KEY_SPACE))
         {
             mouseCaptured = false;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

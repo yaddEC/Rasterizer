@@ -1,4 +1,3 @@
-
 #include <cstdio>
 #include <cstring>
 #include <cassert>
@@ -54,16 +53,16 @@ void Renderer::SetTexture(float* p_colors32Bits, const uint p_width, const uint 
     // TODO
 }
 
-void Renderer::DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y, Vec4 p_color)
+void Renderer::DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y, color4 p_color)
 {
     float* colorBuffer = fb->GetColorBuffer();
     
-    colorBuffer[(p_x + p_y*p_width) *4] = p_color.x;
-    colorBuffer[(p_x + p_y*p_width) *4 + 1] = p_color.y;
-    colorBuffer[(p_x + p_y*p_width) *4 + 2] = p_color.z;
-    colorBuffer[(p_x + p_y*p_width) *4 + 3] = p_color.w;
+    colorBuffer[(p_x + p_y*p_width) *4] = p_color.r;
+    colorBuffer[(p_x + p_y*p_width) *4 + 1] = p_color.g;
+    colorBuffer[(p_x + p_y*p_width) *4 + 2] = p_color.b;
+    colorBuffer[(p_x + p_y*p_width) *4 + 3] = p_color.a;
 }
-void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
+void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const color4& color)
 {
    int x1=p1.x;
    int y1=p1.y;
@@ -76,16 +75,16 @@ void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
    int ed = dx+dy == 0 ? 1 : sqrt((float)dx*dx+(float)dy*dy);
 
    for ( ; ; ){                                         /* pixel loop */
-      DrawPixel(800,600,x0,y0,{color.x,color.y,color.z,color.w});
+      DrawPixel(800,600,x0,y0,{color.r,color.g,color.b,color.a});
       e2 = err; x2 = x0;
       if (2*e2 >= -dx) {                                    /* x step */
          if (x0 == x1) break;
-         if (e2+dy < ed) DrawPixel(800,600,x0,y0+sy,{color.x,color.y,color.z,color.w});
+         if (e2+dy < ed) DrawPixel(800,600,x0,y0+sy,{color.r,color.g,color.b,color.a});
          err -= dy; x0 += sx; 
       } 
       if (2*e2 <= dy) {                                     /* y step */
          if (y0 == y1) break;
-         if (dx-e2 < ed) DrawPixel(800,600,x2+sx,y0, {color.x,color.y,color.z,color.w});
+         if (dx-e2 < ed) DrawPixel(800,600,x2+sx,y0, {color.r,color.g,color.b,color.a});
          err += dx; y0 += sy; 
     }
     }
@@ -152,7 +151,7 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     // Draw triangle wireframe 
     
     DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
-    DrawLine(ndcCoords[1], ndcCoords[2], {0,255,0,0.2});
+    DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[0], ndcCoords[2], lineColor); 
     
    DrawLine({0,0,0},{fb->GetWidth(),fb->GetHeight(),0},{0,255,0,1});
@@ -175,5 +174,5 @@ void rdrSetImGuiContext(rdrImpl* renderer, struct ImGuiContext* context)
 
 void Renderer::ShowImGuiControls()
 {
-    ImGui::ColorEdit4("lineColor", &lineColor.x);
+    ImGui::ColorEdit4("lineColor", &lineColor.r);
 }

@@ -75,6 +75,19 @@ void Vec4::Homogenize()
     }
 }
 
+Vec3 Vec4::GetHomogenize()
+{
+    Vec3 result;
+    if (w != 0)
+    {
+        x = x / w;
+        y = y / w;
+        z = z / w;
+    }
+    result = {x,y,z};
+    return(result);
+}
+
 void Vec4::Print()
 {
     printf("\n|%f|%f|%f|%f|\n\n", x, y, z, w);

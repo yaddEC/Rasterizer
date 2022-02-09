@@ -29,6 +29,7 @@ public:
     
     void Print();
     void Homogenize();
+    Vec3 GetHomogenize();
     float GetMagnitude();
     void Normalize();
     Vec4 operator+(const Vec4 &rhs);
@@ -59,4 +60,11 @@ public:
     ~Mat4();
 };
 
+typedef struct color4
+{
+    float r;
+    float g;
+    float b;
+    float a;
+}color4;
 
