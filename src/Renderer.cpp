@@ -65,31 +65,29 @@ void Renderer::DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y, Vec4 p
 }
 void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
 {
-    /*
-   int m_new = 2 * (p1.y - p0.x);
-   int slope_error_new = m_new - (p1.x - p0.x);
-   for (int x = p0.x, y = p0.x; x <= p1.x; x++)
-   {
-      DrawPixel(800,600,x,y,color);
-      slope_error_new += m_new;
-      if (slope_error_new >= 0)
-      {
-         y++;
-         slope_error_new  -= 2 * (p1.x - p0.x);
-      }
-   }
-   */
-    int x0=p0.x, x1=p1.x, y0=p0.y, y1=p1.y;
-    int dx =  abs(x1-x0), sx = x0<x1 ? 1 : -1;
-    int dy = -abs(y1-y0), sy = y0<y1 ? 1 : -1; 
-    int err = dx+dy, e2; 
+   int x1=p1.x*4;
+   int y1=p1.y;
+   int x0=p0.x*4;
+   int y0=p0.y;
 
-    for(;;){  
-        DrawPixel(fb->GetHeight(),fb->GetWidth(),x0,y0,color);
-        if (x0==x1 && y0==y1) break;
-        e2 = 2*err;
-        if (e2 >= dy) { err += dy; x0 += sx; } 
-        if (e2 <= dx) { err += dx; y0 += sy; } 
+   int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
+   int dy = abs(y1-y0), sy = y0<y1 ? 1 : -1; 
+   int err = dx-dy, e2, x2;                       /* error value e_xy */
+   int ed = dx+dy == 0 ? 1 : sqrt((float)dx*dx+(float)dy*dy);
+
+   for ( ; ; ){                                         /* pixel loop */
+      DrawPixel(800,600,x0,y0,{color.x,color.y,color.z,1*(e2+dy)/ed});
+      e2 = err; x2 = x0;
+      if (2*e2 >= -dx) {                                    /* x step */
+         if (x0 == x1) break;
+         if (e2+dy < ed) DrawPixel(800,600,x0,y0+sy,{color.x,color.y,color.z,1*(e2+dy)/ed});
+         err -= dy; x0 += sx; 
+      } 
+      if (2*e2 <= dy) {                                     /* y step */
+         if (y0 == y1) break;
+         if (dx-e2 < ed) DrawPixel(800,600,x2+sx,y0, {color.x,color.y,color.z,1*(dx-e2)/ed});
+         err += dx; y0 += sy; 
+    }
     }
 }
 
@@ -151,8 +149,10 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     // Draw triangle wireframe 
     
     DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
-    DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
-    DrawLine(ndcCoords[2], ndcCoords[0], lineColor); 
+    DrawLine(ndcCoords[2], ndcCoords[1], lineColor);
+    DrawLine(ndcCoords[0], ndcCoords[2], lineColor);
+
+    DrawLine({0,100,0},{100,100,0}, lineColor);
 }
 
 void Renderer::DrawTriangles(rdrVertex* p_vertices, const uint p_count)
