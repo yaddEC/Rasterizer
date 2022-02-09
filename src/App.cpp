@@ -106,7 +106,7 @@ void App::Update()
     double mouseY = 0.0;
     float mouseDeltaX = 0.0;
     float mouseDeltaY = 0.0;
-    while (glfwWindowShouldClose(window) == false)
+    while (glfwWindowShouldClose(window) == false && !glfwGetKey(window,GLFW_KEY_ESCAPE))
     {
         NewFrame(mouseCaptured); //ImGui
 
@@ -120,7 +120,7 @@ void App::Update()
         }
 
         // Update camera
-        if (ImGui::IsKeyPressed(GLFW_KEY_ESCAPE))
+        if (ImGui::IsKeyPressed(GLFW_KEY_ENTER))
         {
             mouseCaptured = false;
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
