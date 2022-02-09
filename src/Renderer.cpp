@@ -57,17 +57,17 @@ void Renderer::SetTexture(float* p_colors32Bits, const uint p_width, const uint 
 void Renderer::DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y, Vec4 p_color)
 {
     float* colorBuffer = fb->GetColorBuffer();
-
-    colorBuffer[p_x + p_y*p_width *4] = p_color.x;
-    colorBuffer[p_x + p_y*p_width *4 + 1] = p_color.y;
-    colorBuffer[p_x + p_y*p_width *4 + 2] = p_color.z;
-    colorBuffer[p_x + p_y*p_width *4 + 3] = p_color.w;
+    
+    colorBuffer[(p_x + p_y*p_width) *4] = p_color.x;
+    colorBuffer[(p_x + p_y*p_width) *4 + 1] = p_color.y;
+    colorBuffer[(p_x + p_y*p_width) *4 + 2] = p_color.z;
+    colorBuffer[(p_x + p_y*p_width) *4 + 3] = p_color.w;
 }
 void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
 {
-   int x1=p1.x*4;
+   int x1=p1.x;
    int y1=p1.y;
-   int x0=p0.x*4;
+   int x0=p0.x;
    int y0=p0.y;
 
    int dx = abs(x1-x0), sx = x0<x1 ? 1 : -1;
@@ -76,16 +76,16 @@ void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
    int ed = dx+dy == 0 ? 1 : sqrt((float)dx*dx+(float)dy*dy);
 
    for ( ; ; ){                                         /* pixel loop */
-      DrawPixel(800,600,x0,y0,{color.x,color.y,color.z,1*(e2+dy)/ed});
+      DrawPixel(800,600,x0,y0,{color.x,color.y,color.z,color.w});
       e2 = err; x2 = x0;
       if (2*e2 >= -dx) {                                    /* x step */
          if (x0 == x1) break;
-         if (e2+dy < ed) DrawPixel(800,600,x0,y0+sy,{color.x,color.y,color.z,1*(e2+dy)/ed});
+         if (e2+dy < ed) DrawPixel(800,600,x0,y0+sy,{color.x,color.y,color.z,color.w});
          err -= dy; x0 += sx; 
       } 
       if (2*e2 <= dy) {                                     /* y step */
          if (y0 == y1) break;
-         if (dx-e2 < ed) DrawPixel(800,600,x2+sx,y0, {color.x,color.y,color.z,1*(dx-e2)/ed});
+         if (dx-e2 < ed) DrawPixel(800,600,x2+sx,y0, {color.x,color.y,color.z,color.w});
          err += dx; y0 += sy; 
     }
     }
@@ -152,10 +152,10 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     // Draw triangle wireframe 
     
     DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
-    DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
+    DrawLine(ndcCoords[1], ndcCoords[2], {0,255,0,0.2});
     DrawLine(ndcCoords[0], ndcCoords[2], lineColor); 
     
-   DrawLine({0,0,0},{fb->GetWidth(),fb->GetHeight(),0},{0,0,255,1});
+   DrawLine({0,0,0},{fb->GetWidth(),fb->GetHeight(),0},{0,255,0,1});
 }
 
 void Renderer::DrawTriangles(rdrVertex* p_vertices, const uint p_count)
