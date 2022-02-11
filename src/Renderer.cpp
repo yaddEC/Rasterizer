@@ -185,9 +185,9 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[0], ndcCoords[2], lineColor); 
 
-    for(int i=0; i<viewport.width;i++)
+    for(float i=0; i<viewport.width;i++)
     {
-        for(int j=0; j<viewport.height;j++)
+        for(float j=0; j<viewport.height;j++)
         {
             BarycenterGen(ndcCoords[0], ndcCoords[1], ndcCoords[2], {i,j,0}, viewport);
         }
