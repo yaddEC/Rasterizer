@@ -53,16 +53,47 @@ void Renderer::SetTexture(float* p_colors32Bits, const uint p_width, const uint 
     // TODO
 }
 
-void Renderer::DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y, color4 p_color)
+float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
+{
+    float temp;
+    temp = (ver3.x - ver1.x) * (ver2.y - ver1.y) - (ver3.y - ver1.y) * (ver2.x - ver1.x);
+    return temp;
+    
+}
+
+
+
+
+
+
+void Renderer::DrawPixel(const uint p_width,const uint p_height, const uint p_x, const uint p_y, const Vec4 p_color)
 {
     float* colorBuffer = fb->GetColorBuffer();
     
-    colorBuffer[(p_x + p_y*p_width) *4] = p_color.r;
-    colorBuffer[(p_x + p_y*p_width) *4 + 1] = p_color.g;
-    colorBuffer[(p_x + p_y*p_width) *4 + 2] = p_color.b;
-    colorBuffer[(p_x + p_y*p_width) *4 + 3] = p_color.a;
+    colorBuffer[(p_x + p_y*p_width) *4] = p_color.x;
+    colorBuffer[(p_x + p_y*p_width) *4 + 1] = p_color.y;
+    colorBuffer[(p_x + p_y*p_width) *4 + 2] = p_color.z;
+    colorBuffer[(p_x + p_y*p_width) *4 + 3] = p_color.w;
 }
-void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const color4& color)
+
+Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
+{
+float area = edgeVertices(ver1, ver2, ver3); 
+float w0 = edgeVertices(ver2, ver3, p); 
+float w1 = edgeVertices(ver3, ver1, p); 
+float w2 = edgeVertices(ver1, ver2, p); 
+
+
+if (w0 >= 0 && w1 >= 0 && w2 >= 0) {
+   
+    w0 /= area;
+    w1 /= area;
+    w2 /= area;
+    DrawPixel(vp.width,vp.height,p.x,p.y,{w0,w1,w2,1});
+}
+
+}
+void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const Vec4& color)
 {
    int x1=p1.x;
    int y1=p1.y;
@@ -75,16 +106,16 @@ void Renderer::DrawLine(const Vec3& p0, const Vec3& p1, const color4& color)
    int ed = dx+dy == 0 ? 1 : sqrt((float)dx*dx+(float)dy*dy);
 
    for ( ; ; ){                                         /* pixel loop */
-      DrawPixel(800,600,x0,y0,{color.r,color.g,color.b,color.a});
+      DrawPixel(800,600,x0,y0,{color.x,color.y,color.z,color.w});
       e2 = err; x2 = x0;
       if (2*e2 >= -dx) {                                    /* x step */
          if (x0 == x1) break;
-         if (e2+dy < ed) DrawPixel(800,600,x0,y0+sy,{color.r,color.g,color.b,color.a});
+         if (e2+dy < ed) DrawPixel(800,600,x0,y0+sy,{color.x,color.y,color.z,color.w});
          err -= dy; x0 += sx; 
       } 
       if (2*e2 <= dy) {                                     /* y step */
          if (y0 == y1) break;
-         if (dx-e2 < ed) DrawPixel(800,600,x2+sx,y0, {color.r,color.g,color.b,color.a});
+         if (dx-e2 < ed) DrawPixel(800,600,x2+sx,y0, {color.x,color.y,color.z,color.w});
          err += dx; y0 += sy; 
     }
     }
@@ -153,8 +184,17 @@ void Renderer::DrawTriangle(rdrVertex* vertices)
     DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
     DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[0], ndcCoords[2], lineColor); 
+
+    for(int i=0; i<viewport.width;i++)
+    {
+        for(int j=0; j<viewport.height;j++)
+        {
+            BarycenterGen(ndcCoords[0], ndcCoords[1], ndcCoords[2], {i,j,0}, viewport);
+        }
+    }
     
-   DrawLine({0,0,0},{fb->GetWidth(),fb->GetHeight(),0},{0,255,0,1});
+    
+   
 }
 
 void Renderer::DrawTriangles(rdrVertex* p_vertices, const uint p_count)
@@ -174,5 +214,5 @@ void rdrSetImGuiContext(rdrImpl* renderer, struct ImGuiContext* context)
 
 void Renderer::ShowImGuiControls()
 {
-    ImGui::ColorEdit4("lineColor", &lineColor.r);
+    ImGui::ColorEdit4("lineColor", &lineColor.x);
 }
