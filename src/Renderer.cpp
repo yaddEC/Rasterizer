@@ -58,16 +58,17 @@ float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
     return temp;
 }
 
-void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const Vec4 p_color, float test)
+void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const Vec4 p_color)
 {
     float *colorBuffer = fb->GetColorBuffer();
 
-  if(test>0) 
-{        colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;
+    
+        colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;
         colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;
         colorBuffer[(p_x + p_y * p_width) * 4 + 2] = p_color.z;
-        colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;}
-        }
+        colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;
+    
+}
 
 Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
@@ -100,7 +101,10 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 
     for (;;)
     { /* pixel loop */
-        DrawPixel(800, 600, x0, y0, {color.x, color.y, color.z, color.w},y0);
+        if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && x0 < viewport.width * viewport.height)
+        {
+            DrawPixel(800, 600, x0, y0, {color.x, color.y, color.z, color.w});
+        }
         e2 = err;
         x2 = x0;
         if (2 * e2 >= -dx)
@@ -108,7 +112,10 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(x0) == roundf(x1))
                 break;
             if (e2 + dy < ed)
-                DrawPixel(800, 600, x0, y0 + sy, {color.x, color.y, color.z, color.w},y0);
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && x0 < viewport.width * viewport.height)
+                {
+                    DrawPixel(800, 600, x0, y0 + sy, {color.x, color.y, color.z, color.w});
+                }
             err -= dy;
             x0 += sx;
         }
@@ -117,7 +124,10 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(y0) == roundf(y1))
                 break;
             if (dx - e2 < ed)
-                DrawPixel(800, 600, x2 + sx, y0, {color.x, color.y, color.z, color.w},y0);
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && x0 < viewport.width * viewport.height)
+                {
+                    DrawPixel(800, 600, x2 + sx, y0, {color.x, color.y, color.z, color.w});
+                }
             err += dx;
             y0 += sy;
         }
@@ -132,21 +142,22 @@ Vec3 ndcToScreenCoords(Vec3 ndc, const Viewport &viewport)
     return ndc;
 }
 
-void Renderer::DrawQuad(rdrVertex *vertices,const Vec3 &rotation, const Vec3 &position,const Vec3 &scale)
+void Renderer::DrawQuad(rdrVertex *vertices, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
 {
     rdrVertex vert1[3];
+
     vert1[0] = vertices[0];
     vert1[1] = vertices[1];
     vert1[2] = vertices[3];
-    DrawTriangle(vert1,rotation,position,scale);
-    vert1[0] = vertices[2];
-        vert1[1] = vertices[3];
-    vert1[2] = vertices[1];
-    DrawTriangle(vert1,rotation,position,scale);
+    DrawTriangle(vert1, rotation, position, scale);
 
+    vert1[0] = vertices[2];
+    vert1[1] = vertices[3];
+    vert1[2] = vertices[1];
+    DrawTriangle(vert1, rotation, position, scale);
 }
 
-void Renderer::DrawTriangle(rdrVertex *vertices,const Vec3 &rotation, const Vec3 &position,const Vec3 &scale)
+void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
 {
     // Store triangle vertices positions
     Vec3 localCoords[3] = {
@@ -163,7 +174,7 @@ void Renderer::DrawTriangle(rdrVertex *vertices,const Vec3 &rotation, const Vec3
         {Vec4{localCoords[2], 1.f}},
     };
 
-    Mat4 translate = translate.CreateTransformMatrix(rotation,position,scale);
+    Mat4 translate = translate.CreateTransformMatrix(rotation, position, scale);
 
     clipCoords[0] = translate * clipCoords[0];
     clipCoords[1] = translate * clipCoords[1];
@@ -191,32 +202,32 @@ void Renderer::DrawTriangle(rdrVertex *vertices,const Vec3 &rotation, const Vec3
     DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[0], ndcCoords[2], lineColor);
 
-    for(int i=0; i<viewport.width;i++)
+    for (int i = 0; i < viewport.width; i++)
     {
-        for(int j=0; j<viewport.height;j++)
+        for (int j = 0; j < viewport.height; j++)
         {
-            BarycenterGen(ndcCoords[0], ndcCoords[1], ndcCoords[2], {i,j,0}, viewport);
+            BarycenterGen(ndcCoords[0], ndcCoords[1], ndcCoords[2], {i, j, 0}, viewport);
         }
-    } 
-}
-
-void Renderer::DrawTriangles(rdrVertex *p_vertices, const uint p_count,const Vec3 &rotation, const Vec3 &position,const Vec3 &scale)
-{
-    // calculate mvp from matrices
-    // Transform vertex list to triangles into colorBuffer
-    for (uint i = 0; i < p_count; i += 3)
-    {
-        DrawTriangle(&p_vertices[i],rotation,position,scale);
     }
 }
 
-void Renderer::DrawQuads(rdrVertex *p_vertices, const uint p_count,const Vec3 &rotation, const Vec3 &position,const Vec3 &scale)
+void Renderer::DrawTriangles(rdrVertex *p_vertices, const uint p_count, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
 {
     // calculate mvp from matrices
     // Transform vertex list to triangles into colorBuffer
     for (uint i = 0; i < p_count; i += 3)
     {
-        DrawQuad(&p_vertices[i],rotation,position,scale);
+        DrawTriangle(&p_vertices[i], rotation, position, scale);
+    }
+}
+
+void Renderer::DrawQuads(rdrVertex *p_vertices, const uint p_count, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
+{
+    // calculate mvp from matrices
+    // Transform vertex list to triangles into colorBuffer
+    for (uint i = 0; i < p_count; i += 3)
+    {
+        DrawQuad(&p_vertices[i], rotation, position, scale);
     }
 }
 /*
