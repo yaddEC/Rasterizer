@@ -160,6 +160,12 @@ void App::Update()
             if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 camera.ShowImGuiControls();
+
+            }
+             if (ImGui::CollapsingHeader("Scene", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                scene.ShowImGuiControls();
+                
             }
         }
         ImGui::End();
