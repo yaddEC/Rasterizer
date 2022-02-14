@@ -67,8 +67,7 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
         colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;
         colorBuffer[(p_x + p_y * p_width) * 4 + 2] = p_color.z;
         colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;}
-    
-}
+        }
 
 Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
@@ -86,6 +85,7 @@ Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
         DrawPixel(vp.width, vp.height, p.x, p.y, {w0, w1, w2, 1});
     }
 }
+
 void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 {
     float x1 = p1.x;
