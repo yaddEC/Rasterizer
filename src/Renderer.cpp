@@ -20,6 +20,7 @@ fb(p_width, p_height),viewport(0,0,p_width, p_height)
 Renderer::Renderer(Framebuffer *f, const uint p_width, const uint p_height) : viewport(0, 0, p_width, p_height)
 {
     fb = f;
+    Zbuffer = fb->GetDepthBuffer();
 }
 
 Renderer::~Renderer()
@@ -58,18 +59,22 @@ float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
     return temp;
 }
 
-void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const Vec4 p_color)
+void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y,const uint p_z, const Vec4 p_color, float test)
 {
     float *colorBuffer = fb->GetColorBuffer();
-
-    
-        colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;
-        colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;
-        colorBuffer[(p_x + p_y * p_width) * 4 + 2] = p_color.z;
-        colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;
+    if(p_x <= p_width && p_y <= p_height && p_x >= 0 && p_y >= 0)
+    {
+        if (Zbuffer[p_x + p_y * p_width] < p_z)
+        {
+            Zbuffer[p_x + p_y * p_width] = p_z;
+            colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;
+            colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;
+            colorBuffer[(p_x + p_y * p_width) * 4 + 2] = p_color.z;
+            colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;
+        }
+    }
     
 }
-
 Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
     float area = edgeVertices(ver1, ver2, ver3);
@@ -83,7 +88,7 @@ Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
         w0 /= area;
         w1 /= area;
         w2 /= area;
-        DrawPixel(vp.width, vp.height, p.x, p.y, {w0, w1, w2, 1});
+        DrawPixel(vp.width, vp.height, p.x, p.y, p.z,{w0, w1, w2, 1});
     }
 }
 
@@ -96,7 +101,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
     int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    int err = dx - dy, e2, x2; /* error value e_xy */
+    int err = dx - dy, e2, x2; 
     int ed = dx + dy == 0 ? 1 : sqrt((float)dx * dx + (float)dy * dy);
 
     for (;;)
@@ -108,7 +113,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
         e2 = err;
         x2 = x0;
         if (2 * e2 >= -dx)
-        { /* x step */
+        { 
             if (roundf(x0) == roundf(x1))
                 break;
             if (e2 + dy < ed)
@@ -120,7 +125,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             x0 += sx;
         }
         if (2 * e2 <= dy)
-        { /* y step */
+        { 
             if (roundf(y0) == roundf(y1))
                 break;
             if (dx - e2 < ed)
