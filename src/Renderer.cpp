@@ -59,7 +59,7 @@ float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
     return temp;
 }
 
-void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y,const uint p_z, const Vec4 p_color, float test)
+void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y,const uint p_z, const Vec4 p_color)
 {
     float *colorBuffer = fb->GetColorBuffer();
     if(p_x <= p_width && p_y <= p_height && p_x >= 0 && p_y >= 0)
@@ -108,7 +108,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
     { /* pixel loop */
         if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
         {
-            DrawPixel(800, 600, x0, y0, {color.x, color.y, color.z, color.w});
+            DrawPixel(800, 600, x0, y0,p0.z, {color.x, color.y, color.z, color.w});
         }
         e2 = err;
         x2 = x0;
@@ -119,7 +119,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (e2 + dy < ed)
                 if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
                 {
-                    DrawPixel(800, 600, x0, y0 + sy, {color.x, color.y, color.z, color.w});
+                    DrawPixel(800, 600, x0, y0 + sy,p0.z, {color.x, color.y, color.z, color.w});
                 }
             err -= dy;
             x0 += sx;
@@ -131,7 +131,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (dx - e2 < ed)
                 if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
                 {
-                    DrawPixel(800, 600, x2 + sx, y0, {color.x, color.y, color.z, color.w});
+                    DrawPixel(800, 600, x2 + sx, y0,p0.z, {color.x, color.y, color.z, color.w});
                 }
             err += dx;
             y0 += sy;
@@ -207,7 +207,7 @@ void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec
     DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[0], ndcCoords[2], lineColor);
 
-  /*   for (int i = 0; i < viewport.width; i++)
+ /*    for (int i = 0; i < viewport.width; i++)
     {
         for (int j = 0; j < viewport.height; j++)
         {

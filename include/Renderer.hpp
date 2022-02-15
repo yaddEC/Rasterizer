@@ -51,7 +51,7 @@ public:
     void DrawLine(const Vec3& p_0, const Vec3& p_1, const Vec4& p_color);
     void DrawTriangles(rdrVertex* p_vertices, const uint p_count,const Vec3 &rotation = {0,0,0}, const Vec3 &position = {0,0,0},const Vec3 &scale ={0,0,0});
     void DrawQuads(rdrVertex* p_vertices, const uint p_count,const Vec3 &rotation = {0,0,0}, const Vec3 &position = {0,0,0},const Vec3 &scale ={0,0,0});
-    void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y,const uint p_z, Vec4 p_color, float test = 559);
+    void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y,const uint p_z, Vec4 p_color);
     Vec3 BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp);
     
     void ShowImGuiControls();
