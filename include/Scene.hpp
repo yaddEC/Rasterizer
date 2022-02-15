@@ -8,16 +8,10 @@ private:
     double time = 0.0;
     std::vector<rdrVertex> vertices;
     std::vector<rdrVertex> vertices1;
-    std::vector<rdrVertex> vertices2;
-    std::vector<rdrVertex> vertices3;
-    std::vector<rdrVertex> vertices4;
-    std::vector<rdrVertex> vertices5;
-    std::vector<rdrVertex> vertices6;
+
     Vec3 *cubeVertice ;
-    float rot1,rot2;
-    float scalex=0.f;
-float scale=1.f;
-    float rot=0;
+    float rotX,rotY,rotZ,transX,transY,transZ,scale,scaleX,scaleY,scaleZ;
+
     bool isExo1=false;
     
 public:

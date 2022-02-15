@@ -101,7 +101,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 
     for (;;)
     { /* pixel loop */
-        if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && x0 < viewport.width * viewport.height)
+        if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
         {
             DrawPixel(800, 600, x0, y0, {color.x, color.y, color.z, color.w});
         }
@@ -112,7 +112,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(x0) == roundf(x1))
                 break;
             if (e2 + dy < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && x0 < viewport.width * viewport.height)
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
                 {
                     DrawPixel(800, 600, x0, y0 + sy, {color.x, color.y, color.z, color.w});
                 }
@@ -124,7 +124,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(y0) == roundf(y1))
                 break;
             if (dx - e2 < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && x0 < viewport.width * viewport.height)
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
                 {
                     DrawPixel(800, 600, x2 + sx, y0, {color.x, color.y, color.z, color.w});
                 }
@@ -202,13 +202,13 @@ void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec
     DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
     DrawLine(ndcCoords[0], ndcCoords[2], lineColor);
 
-    for (int i = 0; i < viewport.width; i++)
+  /*   for (int i = 0; i < viewport.width; i++)
     {
         for (int j = 0; j < viewport.height; j++)
         {
             BarycenterGen(ndcCoords[0], ndcCoords[1], ndcCoords[2], {i, j, 0}, viewport);
         }
-    }
+    } */
 }
 
 void Renderer::DrawTriangles(rdrVertex *p_vertices, const uint p_count, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
@@ -225,7 +225,7 @@ void Renderer::DrawQuads(rdrVertex *p_vertices, const uint p_count, const Vec3 &
 {
     // calculate mvp from matrices
     // Transform vertex list to triangles into colorBuffer
-    for (uint i = 0; i < p_count; i += 3)
+    for (uint i = 0; i < p_count; i += 4)
     {
         DrawQuad(&p_vertices[i], rotation, position, scale);
     }
@@ -239,4 +239,5 @@ void rdrSetImGuiContext(rdrImpl* renderer, struct ImGuiContext* context)
 void Renderer::ShowImGuiControls()
 {
     ImGui::ColorEdit4("lineColor", &lineColor.x);
+    
 }
