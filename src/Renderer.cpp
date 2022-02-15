@@ -62,14 +62,18 @@ float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
 void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y,const uint p_z, const Vec4 p_color, float test)
 {
     float *colorBuffer = fb->GetColorBuffer();
-    if (Zbuffer[p_x + p_y * p_width] <= p_z)
+    if(p_x <= p_width && p_y <= p_height && p_x >= 0 && p_y >= 0)
     {
-        Zbuffer[p_x + p_y * p_width] = p_z;
-        colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;
-        colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;
-        colorBuffer[(p_x + p_y * p_width) * 4 + 2] = p_color.z;
-        colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;
+        if (Zbuffer[p_x + p_y * p_width] < p_z)
+        {
+            Zbuffer[p_x + p_y * p_width] = p_z;
+            colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;
+            colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;
+            colorBuffer[(p_x + p_y * p_width) * 4 + 2] = p_color.z;
+            colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;
+        }
     }
+    
 }
 Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
