@@ -59,10 +59,62 @@ float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
     return temp;
 }
 
-void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y,const uint p_z, const Vec4 p_color)
+float GetMin(float a, float b, float c)
+{
+    if (a < b)
+    {
+        if (a < c)
+        {
+            return a;
+        }
+        else
+        {
+            return c;
+        }
+    }
+    else
+    {
+        if (b < c)
+        {
+            return b;
+        }
+        else
+        {
+            return c;
+        }
+    }
+}
+
+float GetMax(float a, float b, float c)
+{
+    if (a > b)
+    {
+        if (a > c)
+        {
+            return a;
+        }
+        else
+        {
+            return c;
+        }
+    }
+    else
+    {
+        if (b > c)
+        {
+            return b;
+        }
+        else
+        {
+            return c;
+        }
+    }
+}
+
+void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const uint p_z, const Vec4 p_color)
 {
     float *colorBuffer = fb->GetColorBuffer();
-    if(p_x <= p_width && p_y <= p_height && p_x >= 0 && p_y >= 0)
+    if (p_x <= p_width && p_y <= p_height && p_x >= 0 && p_y >= 0)
     {
         if (Zbuffer[p_x + p_y * p_width] < p_z)
         {
@@ -73,7 +125,6 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
             colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;
         }
     }
-    
 }
 Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
@@ -88,7 +139,7 @@ Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
         w0 /= area;
         w1 /= area;
         w2 /= area;
-        DrawPixel(vp.width, vp.height, p.x, p.y, p.z,{w0, w1, w2, 1});
+        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, {w0, w1, w2, 1});
     }
 }
 
@@ -101,37 +152,37 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 
     int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
     int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    int err = dx - dy, e2, x2; 
+    int err = dx - dy, e2, x2;
     int ed = dx + dy == 0 ? 1 : sqrt((float)dx * dx + (float)dy * dy);
 
     for (;;)
     { /* pixel loop */
-        if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
+        if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height)
         {
-            DrawPixel(800, 600, x0, y0,p0.z, {color.x, color.y, color.z, color.w});
+            DrawPixel(800, 600, x0, y0, p0.z, {color.x, color.y, color.z, color.w});
         }
         e2 = err;
         x2 = x0;
         if (2 * e2 >= -dx)
-        { 
+        {
             if (roundf(x0) == roundf(x1))
                 break;
             if (e2 + dy < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height)
                 {
-                    DrawPixel(800, 600, x0, y0 + sy,p0.z, {color.x, color.y, color.z, color.w});
+                    DrawPixel(800, 600, x0, y0 + sy, p0.z, {color.x, color.y, color.z, color.w});
                 }
             err -= dy;
             x0 += sx;
         }
         if (2 * e2 <= dy)
-        { 
+        {
             if (roundf(y0) == roundf(y1))
                 break;
             if (dx - e2 < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width*y0 < viewport.width * viewport.height )
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height)
                 {
-                    DrawPixel(800, 600, x2 + sx, y0,p0.z, {color.x, color.y, color.z, color.w});
+                    DrawPixel(800, 600, x2 + sx, y0, p0.z, {color.x, color.y, color.z, color.w});
                 }
             err += dx;
             y0 += sy;
@@ -200,20 +251,23 @@ void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec
         {ndcToScreenCoords(ndcCoords[1], viewport)},
         {ndcToScreenCoords(ndcCoords[2], viewport)},
     };
+    int iMin = (int)GetMin(ndcCoords[0].x, ndcCoords[1].x, ndcCoords[2].x);
+    int iMax = (int)GetMax(ndcCoords[0].x, ndcCoords[1].x, ndcCoords[2].x);
+    int jMin = (int)GetMin(ndcCoords[0].y, ndcCoords[1].y, ndcCoords[2].y);
+    int jMax = (int)GetMax(ndcCoords[0].y, ndcCoords[1].y, ndcCoords[2].y);
 
     // Draw triangle wireframe
 
-    DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
-    DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
-    DrawLine(ndcCoords[0], ndcCoords[2], lineColor);
-
- /*    for (int i = 0; i < viewport.width; i++)
+    for (int i = iMin; i < iMax; i++)
     {
-        for (int j = 0; j < viewport.height; j++)
+        for (int j = jMin; j < jMax; j++)
         {
             BarycenterGen(ndcCoords[0], ndcCoords[1], ndcCoords[2], {i, j, 0}, viewport);
         }
-    } */
+    }
+    DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
+    DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
+    DrawLine(ndcCoords[0], ndcCoords[2], lineColor);
 }
 
 void Renderer::DrawTriangles(rdrVertex *p_vertices, const uint p_count, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
@@ -244,5 +298,4 @@ void rdrSetImGuiContext(rdrImpl* renderer, struct ImGuiContext* context)
 void Renderer::ShowImGuiControls()
 {
     ImGui::ColorEdit4("lineColor", &lineColor.x);
-    
 }
