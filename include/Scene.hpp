@@ -2,6 +2,7 @@
 #include <vector>
 #include <Renderer.hpp>
 
+
 class Scene
 {
 private:
@@ -18,6 +19,7 @@ public:
     Scene();
     ~Scene();
     void Update(float p_deltaTime, Renderer& p_renderer);
+    void DrawSphere(const int lon, const int lat, const float& radius, const Vec3& rotation, Vec3 translation,const Vec3& scale,Vec3 position, Renderer& renderer);
     void ShowImGuiControls();
 
 private:

@@ -16,6 +16,55 @@ Vec3 *CubeGen(Vec3 startPos, float size, Vec3 points[])
     return points;
 }
 
+inline Vec3 getSphericalCoords(const float r, const float theta, const float phi)
+{
+    return { r * sinf(theta) * cosf(phi),
+             r * cosf(theta),
+             r * sinf(theta) * sinf(phi)
+    };
+}
+
+void Scene::DrawSphere(const int lon, const int lat, const float& radius, const Vec3& rotation, Vec3 translation,const Vec3& scale,Vec3 position, Renderer& renderer)
+{
+    rdrVertex vertices[4];
+
+    for (int j = 0; j < lat; ++j)
+    {
+        float theta0 = ((j+0) / (float)lat) * M_PI;
+        float theta1 = ((j+1) / (float)lat) * M_PI;
+
+        for (int i = 0; i < lon; ++i)
+        {
+            float phi0 = ((i+0) / (float)lon) * 2.f * M_PI;
+            float phi1 = ((i+1) / (float)lon) * 2.f * M_PI;
+
+            Vec4 c0 = getSphericalCoords(radius, theta0, phi0);
+            Vec4 c1 = getSphericalCoords(radius, theta0, phi1);
+            Vec4 c2 = getSphericalCoords(radius, theta1, phi1);
+            Vec4 c3 = getSphericalCoords(radius, theta1, phi0);
+            Vec3 trans = translation+position;
+            Mat4 transform = transform.CreateTransformMatrix(rotation, trans, scale);
+            c0 = transform*c0;
+            c1 = transform*c1;
+            c2 = transform*c2;
+            c3 = transform*c3;
+
+            vertices[0].SetPosition(c0.x,c0.y,c0.z);
+            vertices[1].SetPosition(c1.x,c1.y,c1.z);
+            vertices[2].SetPosition(c2.x,c2.y,c2.z);
+            vertices[3].SetPosition(c3.x,c3.y,c3.z);
+
+            vertices[0].SetColor(0.5f,0,0,0);
+            vertices[1].SetColor(1.0f,0.2f,0,0);
+            vertices[2].SetColor(1.0f,0,1.0f,0);
+            vertices[3].SetColor(0,0,0,0);
+
+            renderer.DrawQuads(vertices,1);
+
+        }
+    }
+}
+
 Scene::Scene()
 {
     // HERE: Load the scene
@@ -104,7 +153,7 @@ void Scene::Update(float deltaTime, Renderer &renderer)
     // Draw
 
     renderer.DrawQuads(vertices1.data(), (int)vertices1.size(), {rotX, rotY, rotZ}, {transX, transY, transZ}, {scaleX, scaleY, scaleZ});
-
+    DrawSphere(10,13,1,{rotX, rotY, rotZ},{transX, transY, transZ}, {scaleX, scaleY, scaleZ},{0.5, 0, 2},renderer);
     if (isExo1)
         renderer.DrawTriangles(vertices.data(), (int)vertices.size(), {M_PI, 0, 0}, {450, 250, transZ}, {200, 200, 0});
 

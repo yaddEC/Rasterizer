@@ -8,6 +8,21 @@
 
 #include <Renderer.hpp>
 
+void rdrVertex::SetColor(float a1, float b1, float c1, float d1)
+{
+    r=a1;
+    g=b1;
+    b=c1;
+    a=d1;
+}
+
+void rdrVertex::SetPosition(float a1, float b1, float c1)
+{
+    x=a1;
+    y=b1;
+    z=c1;
+}
+
 /*
 Renderer::Renderer(float* p_colorBuffer32Bits, float* p_depthBuffer, const uint p_width, const uint p_height):
 fb(p_width, p_height),viewport(0,0,p_width, p_height)
@@ -126,7 +141,7 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
         }
     }
 }
-Vec3 Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
+void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
     float area = edgeVertices(ver1, ver2, ver3);
     float w0 = edgeVertices(ver2, ver3, p);
@@ -230,11 +245,11 @@ void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec
         {Vec4{localCoords[2], 1.f}},
     };
 
-    Mat4 translate = translate.CreateTransformMatrix(rotation, position, scale);
+    Mat4 transform = transform.CreateTransformMatrix(rotation, position, scale);
 
-    clipCoords[0] = translate * clipCoords[0];
-    clipCoords[1] = translate * clipCoords[1];
-    clipCoords[2] = translate * clipCoords[2];
+    clipCoords[0] = transform * clipCoords[0];
+    clipCoords[1] = transform * clipCoords[1];
+    clipCoords[2] = transform * clipCoords[2];
 
     // Clip space (v4) to NDC (v3)
     // TODO
