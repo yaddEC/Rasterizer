@@ -8,6 +8,7 @@ private:
     double time = 0.0;
     std::vector<rdrVertex> vertices;
     std::vector<rdrVertex> vertices1;
+    std::vector<Light> light;
 
     Vec3 *cubeVertice;
 

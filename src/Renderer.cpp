@@ -51,6 +51,19 @@ Renderer::~Renderer()
 {
 }
 
+Light::Light()
+{
+    position = {0.f,0.f,0.f};
+    ambientComponent = 0.2f;
+    diffuseComponent = 0.4f;
+    specularComponent = 0.4f;
+}
+
+Light::~Light()
+{
+
+}
+
 void Renderer::SetProjection(float *p_projectionMatrix)
 {
 
@@ -160,6 +173,17 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
         }
     }
 }
+
+float Light::GetLightRatio(const Vec3 lightVec,const Vec3 ViewVec,const Vec3 NormalVec)
+{
+    Vec3 ReflectVec = 2 * (lightVec * /*Produit scalaire*/ NormalVec) * NormalVec - lightVec;
+    float ambient = ambientComponent;
+    float diffuse = diffuseComponent * (lightVec * /*Produit scalaire*/ NormalVec);
+    float specular = diffuseComponent * (ReflectVec * /*Produit scalaire*/ ViewVec);
+
+    return ambient + diffuse + specular;
+
+}
 void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
     float area = edgeVertices(ver1, ver2, ver3);
@@ -169,11 +193,11 @@ void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
 
     if (w0 >= 0 && w1 >= 0 && w2 >= 0)
     {
-
+        Light light;
         w0 /= area;
         w1 /= area;
         w2 /= area;
-        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, {w0, w1, w2, 1});
+        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, {w0, w1, w2, light.GetLightRatio()});
     }
 }
 

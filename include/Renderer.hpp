@@ -28,6 +28,18 @@ struct Viewport
     uint height;
 };
 
+class Light
+{
+public:
+    Vec3 position;
+    float ambientComponent;
+    float diffuseComponent;
+    float specularComponent;
+
+    Light(/* args */);
+    float GetLightRatio(const Vec3 lightPos,const Vec3 ViewPos,const Vec3 NormalPos);
+    ~Light();
+};
 
 class Renderer
 {
@@ -38,7 +50,7 @@ private:
     Viewport viewport;
     Vec4 lineColor = {0,255,0,0.2};
     Mat4 projMat;
-    bool wireframe=true;
+    bool wireframe=false;
 
 public:
 // Color and depth buffer have to be valid until the shutdown of the renderer
