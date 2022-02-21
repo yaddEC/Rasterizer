@@ -37,7 +37,8 @@ private:
     float rotX,rotY,rotZ,transX,transY,transZ,scaleX,scaleY,scaleZ;
     Viewport viewport;
     Vec4 lineColor = {0,255,0,0.2};
-    bool wireframe=false;
+    Mat4 projMat;
+    bool wireframe=true;
 
 public:
 // Color and depth buffer have to be valid until the shutdown of the renderer
@@ -56,7 +57,7 @@ public:
     void DrawLine(const Vec3& p_0, const Vec3& p_1, const Vec4& p_color);
     void DrawTriangles(rdrVertex* p_vertices, const uint p_count);
     void DrawQuads(rdrVertex* p_vertices, const uint p_count );
-    void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y,const uint p_z, Vec4 p_color);
+    void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y,const float p_z, Vec4 p_color);
     void BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp);
     
     void ShowImGuiControls();

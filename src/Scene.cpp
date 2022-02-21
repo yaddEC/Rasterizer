@@ -72,12 +72,12 @@ Scene::Scene()
     Vec3 cube[8];
 
     scale=1.f;
-    cubeVertice = CubeGen({-0.5, 0, 2}, 1, cube);
+    cubeVertice = CubeGen({-0.5, 0, -1}, -1.5, cube);
     vertices = {
         //       pos                  normal                  color              uv
-        {-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
-        {0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f},
-        {0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f},
+        {-0.5f, -0.5f, 5.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        {0.5f, -0.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f},
+        {0.0f, 0.5f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f},
 
     };
     vertices1 = {
@@ -125,8 +125,8 @@ void Scene::Update(float deltaTime, Renderer &renderer)
 
     // Draw
 
+    DrawSphere(10,13,1,{0.5, 0, 1},renderer);
     renderer.DrawQuads(vertices1.data(), (int)vertices1.size());
-    DrawSphere(10,13,1,{0.5, 0, 2},renderer);
     if (isExo1)
         renderer.DrawTriangles(vertices.data(), (int)vertices.size());
 

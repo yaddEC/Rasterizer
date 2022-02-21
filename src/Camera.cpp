@@ -24,8 +24,21 @@ Mat4 Camera::GetViewMatrix()
 
 Mat4 Camera::GetProjection()
 {
-    //TODO
-    return Mat4::identity();
+        float f =100;// far clipping plane
+    float n = 2; // near clipping plane
+    float fov = 60;
+    float s = 1/tanf((fov/2)*(M_PI/180));
+    float c = f/(f-n);
+    float array[16]
+    ={
+         
+        s, 0.f, 0.f, 0.f,
+        0.f, s, 0.f, 0.f,
+        0.f, 0.f, -c, -1.f,
+        0.f, 0.f, -(c*n), 0.f,
+        
+    };
+    return array;
 }
 
 void Camera::ShowImGuiControls()

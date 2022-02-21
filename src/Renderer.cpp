@@ -41,10 +41,10 @@ Renderer::Renderer(Framebuffer *f, const uint p_width, const uint p_height) : vi
     rotZ = 0;
     transX = 0;
     transY = 0;
-    transZ = 0;
-    scaleX = 0.2;
-    scaleY = 0.2;
-    scaleZ = 0.2;
+    transZ = 3;
+    scaleX = 0.8;
+    scaleY = 0.8;
+    scaleZ = 0.8;
 }
 
 Renderer::~Renderer()
@@ -53,9 +53,11 @@ Renderer::~Renderer()
 
 void Renderer::SetProjection(float *p_projectionMatrix)
 {
-    // TODO
-    /* x′=x/−z,
-y′=y/−z */
+
+    for (int i = 0; i < 16; i++)
+    {
+        projMat.mat[i] = p_projectionMatrix[i];
+    }
 }
 
 void Renderer::SetView(float *p_viewMatrix)
@@ -143,10 +145,10 @@ float GetMax(float a, float b, float c)
     }
 }
 
-void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const uint p_z, const Vec4 p_color)
+void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const float p_z, const Vec4 p_color)
 {
     float *colorBuffer = fb->GetColorBuffer();
-    if (p_x <= p_width && p_y <= p_height && p_x >= 0 && p_y >= 0)
+    if (p_x <= p_width - 1 && p_y <= p_height - 1 && p_x >= 0 && p_y >= 0)
     {
         if (Zbuffer[p_x + p_y * p_width] < p_z)
         {
@@ -189,7 +191,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 
     for (;;)
     { /* pixel loop */
-        if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height)
+        if (y0 > 0 && y0 < viewport.width * viewport.height  && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height&& viewport.height * y0 < viewport.width * viewport.height)
         {
             DrawPixel(800, 600, x0, y0, p0.z, {color.x, color.y, color.z, color.w});
         }
@@ -200,7 +202,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(x0) == roundf(x1))
                 break;
             if (e2 + dy < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height)
+                if (y0 > 0 && y0 < viewport.width * viewport.height  && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height&& viewport.height * y0 < viewport.width * viewport.height)
                 {
                     DrawPixel(800, 600, x0, y0 + sy, p0.z, {color.x, color.y, color.z, color.w});
                 }
@@ -212,7 +214,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(y0) == roundf(y1))
                 break;
             if (dx - e2 < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height)
+                if (y0 > 0 && y0 < viewport.width * viewport.height  && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height&& viewport.height * y0 < viewport.width * viewport.height)
                 {
                     DrawPixel(800, 600, x2 + sx, y0, p0.z, {color.x, color.y, color.z, color.w});
                 }
@@ -263,15 +265,21 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {Vec4{localCoords[2], 1.f}},
     };
     Mat4 transform = transform.identity();
+
     SetModel(transform.mat);
 
     clipCoords[0] = transform * clipCoords[0];
     clipCoords[1] = transform * clipCoords[1];
     clipCoords[2] = transform * clipCoords[2];
 
-    // Clip space (v4) to NDC (v3)
-    // TODO
-    Vec3 ndcCoords[3] = {
+    clipCoords[0] = projMat * clipCoords[0];
+    clipCoords[1] = projMat * clipCoords[1];
+    clipCoords[2] = projMat * clipCoords[2];
+    
+
+        // Clip space (v4) to NDC (v3)
+        // TODO
+        Vec3 ndcCoords[3] = {
         {clipCoords[0].x / clipCoords[0].w, clipCoords[0].y / clipCoords[0].w, clipCoords[0].z / clipCoords[0].w},
         {clipCoords[1].x / clipCoords[1].w, clipCoords[1].y / clipCoords[1].w, clipCoords[1].z / clipCoords[1].w},
         {clipCoords[2].x / clipCoords[2].w, clipCoords[2].y / clipCoords[2].w, clipCoords[2].z / clipCoords[2].w},
@@ -303,7 +311,7 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {
             for (int j = jMin; j < jMax; j++)
             {
-                BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, 0}, viewport);
+                BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, (ndcCoords[0].z+ndcCoords[1].z+ndcCoords[2].z)/3}, viewport);
             }
         }
     }
@@ -338,15 +346,15 @@ void Renderer::ShowImGuiControls()
 {
     ImGui::ColorEdit4("lineColor", &lineColor.x);
     ImGui::Checkbox("Wireframe", &wireframe);
-    ImGui::SliderFloat("rotX", &rotX, 0.f, M_PI*2);
-    ImGui::SliderFloat("rotY", &rotY, 0.f, M_PI*2);
-    ImGui::SliderFloat("rotZ", &rotZ, 0.f, M_PI*2);
+    ImGui::SliderFloat("rotX", &rotX, 0, M_PI * 2);
+    ImGui::SliderFloat("rotY", &rotY, 0, M_PI * 2);
+    ImGui::SliderFloat("rotZ", &rotZ, 0, M_PI * 2);
 
-    ImGui::SliderFloat("transX", &transX, 0.f, M_PI*2);
-    ImGui::SliderFloat("transY", &transY, 0.f, M_PI*2);
-    ImGui::SliderFloat("transZ", &transZ, 0.f, M_PI*2);
+    ImGui::SliderFloat("transX", &transX, 0, M_PI * 2);
+    ImGui::SliderFloat("transY", &transY, 0, M_PI * 2);
+    ImGui::SliderFloat("transZ", &transZ, 0, M_PI * 2);
 
-    ImGui::SliderFloat("scaleX", &scaleX, 0.f, M_PI*2);
-    ImGui::SliderFloat("scaleY", &scaleY, 0.f, M_PI*2);
-    ImGui::SliderFloat("scaleZ", &scaleZ, 0.f, M_PI*2);
+    ImGui::SliderFloat("scaleX", &scaleX, 0, M_PI * 2);
+    ImGui::SliderFloat("scaleY", &scaleY, 0, M_PI * 2);
+    ImGui::SliderFloat("scaleZ", &scaleZ, 0, M_PI * 2);
 }
