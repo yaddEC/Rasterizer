@@ -34,8 +34,10 @@ class Renderer
 private:
     Framebuffer* fb;
     float *Zbuffer;
+    float rotX,rotY,rotZ,transX,transY,transZ,scaleX,scaleY,scaleZ;
     Viewport viewport;
     Vec4 lineColor = {0,255,0,0.2};
+    bool wireframe=false;
 
 public:
 // Color and depth buffer have to be valid until the shutdown of the renderer
@@ -52,16 +54,16 @@ public:
     void SetViewport(const int p_x, const int p_y, const uint p_width, const uint p_height);
     void SetTexture(float* p_colors32Bits, const uint p_width, const uint p_height);
     void DrawLine(const Vec3& p_0, const Vec3& p_1, const Vec4& p_color);
-    void DrawTriangles(rdrVertex* p_vertices, const uint p_count,const Vec3 &rotation = {0,0,0}, const Vec3 &position = {0,0,0},const Vec3 &scale ={1,1,1});
-    void DrawQuads(rdrVertex* p_vertices, const uint p_count,const Vec3 &rotation = {0,0,0}, const Vec3 &position = {0,0,0},const Vec3 &scale ={1,1,1});
+    void DrawTriangles(rdrVertex* p_vertices, const uint p_count);
+    void DrawQuads(rdrVertex* p_vertices, const uint p_count );
     void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y,const uint p_z, Vec4 p_color);
     void BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp);
     
     void ShowImGuiControls();
 
 private:
-    void DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec3 &position,const Vec3 &scale);
-    void DrawQuad(rdrVertex* p_vertices, const Vec3 &rotation, const Vec3 &position,const Vec3 &scale);
+    void DrawTriangle(rdrVertex *vertices);
+    void DrawQuad(rdrVertex* p_vertices);
     
 };
 

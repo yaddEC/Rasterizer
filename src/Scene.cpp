@@ -24,7 +24,7 @@ inline Vec3 getSphericalCoords(const float r, const float theta, const float phi
     };
 }
 
-void Scene::DrawSphere(const int lon, const int lat, const float& radius, const Vec3& rotation, Vec3 translation,const Vec3& scale,Vec3 position, Renderer& renderer)
+void Scene::DrawSphere(const int lon, const int lat, const float& radius, Vec3 translation, Renderer& renderer)
 {
     rdrVertex vertices[4];
 
@@ -42,8 +42,8 @@ void Scene::DrawSphere(const int lon, const int lat, const float& radius, const 
             Vec4 c1 = getSphericalCoords(radius, theta0, phi1);
             Vec4 c2 = getSphericalCoords(radius, theta1, phi1);
             Vec4 c3 = getSphericalCoords(radius, theta1, phi0);
-            Vec3 trans = translation+position;
-            Mat4 transform = transform.CreateTransformMatrix(rotation, trans, scale);
+            
+            Mat4 transform = transform.CreateTranslationMatrix(translation);
             c0 = transform*c0;
             c1 = transform*c1;
             c2 = transform*c2;
@@ -70,15 +70,7 @@ Scene::Scene()
     // HERE: Load the scene
     // Setup some vertices to test
     Vec3 cube[8];
-    rotX=M_PI;
-    rotY=0.f;
-    rotZ=0.f;
-    transX=450.f;
-    transY=250.f;
-    transZ=100.f;
-    scaleX=200.f;
-    scaleY=200.f;
-    scaleZ=200.f;
+
     scale=1.f;
     cubeVertice = CubeGen({-0.5, 0, 2}, 1, cube);
     vertices = {
@@ -129,49 +121,23 @@ void Scene::Update(float deltaTime, Renderer &renderer)
 
     // Hard coded matrix
     // TODO: Remove this and use proper functions !
-    Mat4 matrix = {
-        scale,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        scale,
-        0.f,
-        0.f,
-        0.f,
-        0.f,
-        scale,
-        0.f,
-        (float)cos(time) * 0.5f,
-        (float)sin(time) * 0.1f,
-        0.f,
-        1.f,
-    };
 
-    renderer.SetModel(matrix.mat);
 
     // Draw
 
-    renderer.DrawQuads(vertices1.data(), (int)vertices1.size(), {rotX, rotY, rotZ}, {transX, transY, transZ}, {scaleX, scaleY, scaleZ});
-    DrawSphere(10,13,1,{rotX, rotY, rotZ},{transX, transY, transZ}, {scaleX, scaleY, scaleZ},{0.5, 0, 2},renderer);
+    renderer.DrawQuads(vertices1.data(), (int)vertices1.size());
+    DrawSphere(10,13,1,{0.5, 0, 2},renderer);
     if (isExo1)
-        renderer.DrawTriangles(vertices.data(), (int)vertices.size(), {M_PI, 0, 0}, {450, 250, transZ}, {200, 200, 0});
+        renderer.DrawTriangles(vertices.data(), (int)vertices.size());
 
     time += deltaTime;
 }
 
+//Donaudampfschifffahrtsgesellschaftskapitaenswitwe
 void Scene::ShowImGuiControls()
 {
 
-    ImGui::SliderFloat("rotX", &rotX, 0.f, 2 * M_PI);
-    ImGui::SliderFloat("rotY", &rotY, 0.f, 2 * M_PI);
-    ImGui::SliderFloat("rotZ", &rotZ, 0.f, 2 * M_PI);
-    ImGui::SliderFloat("transX", &transX, 100.f, 600.f);
-    ImGui::SliderFloat("transY", &transY, 100.f, 600.f);
-    ImGui::SliderFloat("transZ", &transZ,0.f, 600.f);
-    ImGui::SliderFloat("scaleX", &scaleX, 0.f, 250.f);
-    ImGui::SliderFloat("scaleY", &scaleY, 0.f, 250.f);
-    ImGui::SliderFloat("scaleZ", &scaleZ, 0.f, 250.f);
 
+   
     ImGui::Checkbox("Exo 1", &isExo1);
 }

@@ -10,17 +10,17 @@
 
 void rdrVertex::SetColor(float a1, float b1, float c1, float d1)
 {
-    r=a1;
-    g=b1;
-    b=c1;
-    a=d1;
+    r = a1;
+    g = b1;
+    b = c1;
+    a = d1;
 }
 
 void rdrVertex::SetPosition(float a1, float b1, float c1)
 {
-    x=a1;
-    y=b1;
-    z=c1;
+    x = a1;
+    y = b1;
+    z = c1;
 }
 
 /*
@@ -36,6 +36,15 @@ Renderer::Renderer(Framebuffer *f, const uint p_width, const uint p_height) : vi
 {
     fb = f;
     Zbuffer = fb->GetDepthBuffer();
+    rotX = M_PI;
+    rotY = 0;
+    rotZ = 0;
+    transX = 0;
+    transY = 0;
+    transZ = 0;
+    scaleX = 0.2;
+    scaleY = 0.2;
+    scaleZ = 0.2;
 }
 
 Renderer::~Renderer()
@@ -45,6 +54,8 @@ Renderer::~Renderer()
 void Renderer::SetProjection(float *p_projectionMatrix)
 {
     // TODO
+    /* x′=x/−z,
+y′=y/−z */
 }
 
 void Renderer::SetView(float *p_viewMatrix)
@@ -54,7 +65,13 @@ void Renderer::SetView(float *p_viewMatrix)
 
 void Renderer::SetModel(float *p_modelMatrix)
 {
-    // TODO
+    Mat4 transform = transform.CreateTransformMatrix({rotX, rotY, rotZ}, {transX, transY, transZ}, {scaleX, scaleY, scaleZ});
+    for (int i = 0; i < 16; i++)
+    {
+        p_modelMatrix[i] = transform.mat[i];
+    }
+
+    //comm
 }
 
 void Renderer::SetViewport(const int p_x, const int p_y, const uint p_width, const uint p_height)
@@ -207,28 +224,29 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 
 Vec3 ndcToScreenCoords(Vec3 ndc, const Viewport &viewport)
 {
-    ndc.x = ndc.x * viewport.width + (viewport.width / 2);
-    ndc.y = ndc.y * viewport.height + (viewport.height / 2);
-
-    return ndc;
+    Vec3 screenCoords = {
+        (0.5f + (ndc.x * 0.5f)) * viewport.width,
+        (0.5f + (ndc.y * 0.5f)) * viewport.height,
+        0.f};
+    return screenCoords;
 }
 
-void Renderer::DrawQuad(rdrVertex *vertices, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
+void Renderer::DrawQuad(rdrVertex *vertices)
 {
     rdrVertex vert1[3];
 
     vert1[0] = vertices[0];
     vert1[1] = vertices[1];
     vert1[2] = vertices[3];
-    DrawTriangle(vert1, rotation, position, scale);
+    DrawTriangle(vert1);
 
     vert1[0] = vertices[2];
     vert1[1] = vertices[3];
     vert1[2] = vertices[1];
-    DrawTriangle(vert1, rotation, position, scale);
+    DrawTriangle(vert1);
 }
 
-void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
+void Renderer::DrawTriangle(rdrVertex *vertices)
 {
     // Store triangle vertices positions
     Vec3 localCoords[3] = {
@@ -244,8 +262,8 @@ void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec
         {Vec4{localCoords[1], 1.f}},
         {Vec4{localCoords[2], 1.f}},
     };
-
-    Mat4 transform = transform.CreateTransformMatrix(rotation, position, scale);
+    Mat4 transform = transform.identity();
+    SetModel(transform.mat);
 
     clipCoords[0] = transform * clipCoords[0];
     clipCoords[1] = transform * clipCoords[1];
@@ -266,42 +284,48 @@ void Renderer::DrawTriangle(rdrVertex *vertices, const Vec3 &rotation, const Vec
         {ndcToScreenCoords(ndcCoords[1], viewport)},
         {ndcToScreenCoords(ndcCoords[2], viewport)},
     };
-    int iMin = (int)GetMin(ndcCoords[0].x, ndcCoords[1].x, ndcCoords[2].x);
-    int iMax = (int)GetMax(ndcCoords[0].x, ndcCoords[1].x, ndcCoords[2].x);
-    int jMin = (int)GetMin(ndcCoords[0].y, ndcCoords[1].y, ndcCoords[2].y);
-    int jMax = (int)GetMax(ndcCoords[0].y, ndcCoords[1].y, ndcCoords[2].y);
+    int iMin = (int)GetMin(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
+    int iMax = (int)GetMax(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
+    int jMin = (int)GetMin(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
+    int jMax = (int)GetMax(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
 
     // Draw triangle wireframe
 
-    for (int i = iMin; i < iMax; i++)
+    if (wireframe)
     {
-        for (int j = jMin; j < jMax; j++)
+        DrawLine(screenCoords[0], screenCoords[1], lineColor);
+        DrawLine(screenCoords[1], screenCoords[2], lineColor);
+        DrawLine(screenCoords[0], screenCoords[2], lineColor);
+    }
+    else
+    {
+        for (int i = iMin; i < iMax; i++)
         {
-            BarycenterGen(ndcCoords[0], ndcCoords[1], ndcCoords[2], {i, j, 0}, viewport);
+            for (int j = jMin; j < jMax; j++)
+            {
+                BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, 0}, viewport);
+            }
         }
     }
-    DrawLine(ndcCoords[0], ndcCoords[1], lineColor);
-    DrawLine(ndcCoords[1], ndcCoords[2], lineColor);
-    DrawLine(ndcCoords[0], ndcCoords[2], lineColor);
 }
 
-void Renderer::DrawTriangles(rdrVertex *p_vertices, const uint p_count, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
+void Renderer::DrawTriangles(rdrVertex *p_vertices, const uint p_count)
 {
     // calculate mvp from matrices
     // Transform vertex list to triangles into colorBuffer
     for (uint i = 0; i < p_count; i += 3)
     {
-        DrawTriangle(&p_vertices[i], rotation, position, scale);
+        DrawTriangle(&p_vertices[i]);
     }
 }
 
-void Renderer::DrawQuads(rdrVertex *p_vertices, const uint p_count, const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
+void Renderer::DrawQuads(rdrVertex *p_vertices, const uint p_count)
 {
     // calculate mvp from matrices
     // Transform vertex list to triangles into colorBuffer
     for (uint i = 0; i < p_count; i += 4)
     {
-        DrawQuad(&p_vertices[i], rotation, position, scale);
+        DrawQuad(&p_vertices[i]);
     }
 }
 /*
@@ -313,4 +337,16 @@ void rdrSetImGuiContext(rdrImpl* renderer, struct ImGuiContext* context)
 void Renderer::ShowImGuiControls()
 {
     ImGui::ColorEdit4("lineColor", &lineColor.x);
+    ImGui::Checkbox("Wireframe", &wireframe);
+    ImGui::SliderFloat("rotX", &rotX, 0.f, M_PI*2);
+    ImGui::SliderFloat("rotY", &rotY, 0.f, M_PI*2);
+    ImGui::SliderFloat("rotZ", &rotZ, 0.f, M_PI*2);
+
+    ImGui::SliderFloat("transX", &transX, 0.f, M_PI*2);
+    ImGui::SliderFloat("transY", &transY, 0.f, M_PI*2);
+    ImGui::SliderFloat("transZ", &transZ, 0.f, M_PI*2);
+
+    ImGui::SliderFloat("scaleX", &scaleX, 0.f, M_PI*2);
+    ImGui::SliderFloat("scaleY", &scaleY, 0.f, M_PI*2);
+    ImGui::SliderFloat("scaleZ", &scaleZ, 0.f, M_PI*2);
 }

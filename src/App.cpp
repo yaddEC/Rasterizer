@@ -162,6 +162,11 @@ void App::Update()
                 camera.ShowImGuiControls();
 
             }
+             if (ImGui::CollapsingHeader("Renderer", ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                renderer.ShowImGuiControls();
+
+            }
              if (ImGui::CollapsingHeader("Scene", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 scene.ShowImGuiControls();

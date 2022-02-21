@@ -2,7 +2,6 @@
 #include <vector>
 #include <Renderer.hpp>
 
-
 class Scene
 {
 private:
@@ -10,21 +9,18 @@ private:
     std::vector<rdrVertex> vertices;
     std::vector<rdrVertex> vertices1;
 
-    Vec3 *cubeVertice ;
-    float rotX,rotY,rotZ,transX,transY,transZ,scale,scaleX,scaleY,scaleZ;
+    Vec3 *cubeVertice;
 
-    bool isExo1=false;
-    
+    float rotX, rotY, rotZ, transX, transY, transZ, scale, scaleX, scaleY, scaleZ;
+
+    bool isExo1 = false;
+
 public:
     Scene();
     ~Scene();
-    void Update(float p_deltaTime, Renderer& p_renderer);
-    void DrawSphere(const int lon, const int lat, const float& radius, const Vec3& rotation, Vec3 translation,const Vec3& scale,Vec3 position, Renderer& renderer);
+    void Update(float p_deltaTime, Renderer &p_renderer);
+    void DrawSphere(const int lon, const int lat, const float &radius, Vec3 translation, Renderer &renderer);
     void ShowImGuiControls();
 
 private:
-    
-
 };
-
-
