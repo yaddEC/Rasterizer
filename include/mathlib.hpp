@@ -15,6 +15,11 @@ public:
     ~Vec3();
 };
 
+float operator*(const Vec3 &a,const Vec3 &b);
+Vec3 operator-(const Vec3 &a,const Vec3 &b);
+Vec3 operator*(const Vec3 &b,const float &a);
+Vec3 operator*(const float &a,const Vec3 &b);
+
 class Vec4
 {
 public:

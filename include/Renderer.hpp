@@ -31,13 +31,13 @@ struct Viewport
 class Light
 {
 public:
-    Vec3 position;
+    Vec3 positionLight;
     float ambientComponent;
     float diffuseComponent;
     float specularComponent;
 
     Light(/* args */);
-    float GetLightRatio(const Vec3 lightVec,const Vec3 ViewVec,const Vec3 NormalVec);
+    float GetLightRatio(const Vec3 ViewVec,const Vec3 NormalVec);
     ~Light();
 };
 

@@ -53,7 +53,7 @@ Renderer::~Renderer()
 
 Light::Light()
 {
-    position = {0.f,0.f,0.f};
+    positionLight = {0.f,0.f,0.f};
     ambientComponent = 0.2f;
     diffuseComponent = 0.4f;
     specularComponent = 0.4f;
@@ -174,15 +174,14 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
     }
 }
 
-float Light::GetLightRatio(const Vec3 lightVec,const Vec3 ViewVec,const Vec3 NormalVec)
+float Light::GetLightRatio(const Vec3 ViewVec,const Vec3 NormalVec)
 {
-    Vec3 ReflectVec = 2 * (lightVec * /*Produit scalaire*/ NormalVec) * NormalVec - lightVec;
+    Vec3 ReflectVec = 2 * (positionLight * NormalVec) * NormalVec - positionLight;
     float ambient = ambientComponent;
-    float diffuse = diffuseComponent * (lightVec * /*Produit scalaire*/ NormalVec);
-    float specular = diffuseComponent * (ReflectVec * /*Produit scalaire*/ ViewVec);
+    float diffuse = diffuseComponent * (positionLight * NormalVec);
+    float specular = diffuseComponent * (ReflectVec * ViewVec);
 
     return ambient + diffuse + specular;
-
 }
 void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
