@@ -27,15 +27,32 @@ void Vec3::Normalize()
     z = z / GetMagnitude();
 }
 
-Vec3 Vec3::operator+(const Vec3 &rhs)
+Vec3 operator+(const Vec3 &a,const Vec3&b)
 {
-    return {this->x + rhs.x, this->y + rhs.y, this->z + rhs.z};
+    return {a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
-Vec3 Vec3::operator*(const float &rhs)
+Vec3 operator*(const float &a,const Vec3 &b)
 {
-    return {this->x * rhs, this->y * rhs, this->z * rhs};
+    return {b.x * a, b.y * a, b.z * a};
 }
+
+Vec3 operator*(const Vec3 &b,const float &a)
+{
+    return {b.x * a, b.y * a, b.z * a};
+}
+
+float operator*(const Vec3 &a,const Vec3 &b)
+{
+    return (b.x * a.x)+(b.y * a.y)+(b.z * a.z);
+}
+
+Vec3 operator-(const Vec3 &a,const Vec3 &b)
+{
+    return {a.x - b.x,a.y - b.y,a.z - b.z};
+}
+
+
 
 Vec3::~Vec3()
 {
