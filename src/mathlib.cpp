@@ -20,11 +20,12 @@ float Vec3::GetMagnitude()
     return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
 }
 
-void Vec3::Normalize()
+Vec3 Vec3::Normalize()
 {
     x = x / GetMagnitude();
     y = y / GetMagnitude();
     z = z / GetMagnitude();
+    return {x,y,z};
 }
 
 Vec3 operator+(const Vec3 &a,const Vec3&b)
@@ -52,6 +53,10 @@ Vec3 operator-(const Vec3 &a,const Vec3 &b)
     return {a.x - b.x,a.y - b.y,a.z - b.z};
 }
 
+Vec3 CrossProduct(const Vec3 &a,const Vec3 &b)
+{
+    return {a.x*b.x,a.y*b.y,a.z*b.z};
+}
 
 
 Vec3::~Vec3()

@@ -174,14 +174,22 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
     }
 }
 
-float Light::GetLightRatio(const Vec3 ViewVec,const Vec3 NormalVec)
+float Light::GetLightRatio( Vec3 ViewVec, Vec3 NormalVec,Vec3 test)
 {
-    Vec3 ReflectVec = 2 * (positionLight * NormalVec) * NormalVec - positionLight;
-    float ambient = ambientComponent;
-    float diffuse = diffuseComponent * (positionLight * NormalVec);
-    float specular = diffuseComponent * (ReflectVec * ViewVec);
+    Vec3 ReflectVec = (2 * (positionLight * NormalVec) * NormalVec - positionLight);
+    Vec3 test2 = positionLight - test;
+    Vec3 test3 = ViewVec - test;
+    test2.Normalize();
+    test2 = {1 - test2.x,1 - test2.y,1 - test2.z};
+    test3.Normalize();
+    Vec3 test4 = NormalVec.Normalize();
+    test4 = {1 - test4.x,1 - test4.y,1 - test4.z};
 
-    return ambient + diffuse + specular;
+    float ambient = ambientComponent;
+    float diffuse = diffuseComponent * (test2 * NormalVec);
+    float specular = diffuseComponent * (ReflectVec * test3);
+
+    return ambient + diffuse +  specular;
 }
 void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
 {
@@ -190,13 +198,14 @@ void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
     float w1 = edgeVertices(ver3, ver1, p);
     float w2 = edgeVertices(ver1, ver2, p);
 
+    Vec3 normal = CrossProduct(ver1-ver3,ver2-ver3);
     if (w0 >= 0 && w1 >= 0 && w2 >= 0)
     {
         Light light;
         w0 /= area;
         w1 /= area;
         w2 /= area;
-        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, {w0, w1, w2, light.GetLightRatio()});
+        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, {w0, w1, w2, light.GetLightRatio({0.f,0.f,0.f},{normal},p)});
     }
 }
 

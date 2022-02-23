@@ -37,7 +37,7 @@ public:
     float specularComponent;
 
     Light(/* args */);
-    float GetLightRatio(const Vec3 ViewVec,const Vec3 NormalVec);
+    float GetLightRatio(const Vec3 ViewVec,const Vec3 NormalVec,Vec3 test);
     ~Light();
 };
 
