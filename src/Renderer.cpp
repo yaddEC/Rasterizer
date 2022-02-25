@@ -145,7 +145,7 @@ float GetMax(float a, float b, float c)
     }
 }
 
-void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const float p_z, const Vec4 p_color)
+void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x, const uint p_y, const float p_z, const Vec4 p_color)//implement rgba values in Framebuffer table
 {
     float *colorBuffer = fb->GetColorBuffer();
     if (p_x <= p_width - 1 && p_y <= p_height - 1 && p_x >= 0 && p_y >= 0)
@@ -153,8 +153,8 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
         if (Zbuffer[p_x + p_y * p_width] < p_z)
         {
             Zbuffer[p_x + p_y * p_width] = p_z;
-            colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;
-            colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;
+            colorBuffer[(p_x + p_y * p_width) * 4] = p_color.x;         //to get the correct coordinate you add the y * width to x because the coordinate are not ifinite and one y is equal to one width
+            colorBuffer[(p_x + p_y * p_width) * 4 + 1] = p_color.y;     // you add one 3 times because the table is made of floats incremented 4 by 4
             colorBuffer[(p_x + p_y * p_width) * 4 + 2] = p_color.z;
             colorBuffer[(p_x + p_y * p_width) * 4 + 3] = p_color.w;
         }
@@ -260,7 +260,7 @@ Vec3 ndcToScreenCoords(Vec3 ndc, const Viewport &viewport)
     return screenCoords;
 }
 
-void Renderer::DrawQuad(rdrVertex *vertices)
+void Renderer::DrawQuad(rdrVertex *vertices)//Draw rectangle using two triangles
 {
     rdrVertex vert1[3];
 
