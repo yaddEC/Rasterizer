@@ -37,15 +37,7 @@ Renderer::Renderer(Framebuffer *f, const uint p_width, const uint p_height) : vi
 {
     fb = f;
     Zbuffer = fb->GetDepthBuffer();
-    rotX = M_PI;
-    rotY = 0;
-    rotZ = 0;
-    transX = 0;
-    transY = 0;
-    transZ = 3;
-    scaleX = 0.8;
-    scaleY = 0.8;
-    scaleZ = 0.8;
+
 
     posX = 0.f;
     posY = 0.f;
@@ -55,7 +47,6 @@ Renderer::Renderer(Framebuffer *f, const uint p_width, const uint p_height) : vi
 Renderer::~Renderer()
 {
 }
-
 
 void Renderer::SetProjection(float *p_projectionMatrix)
 {
@@ -68,15 +59,18 @@ void Renderer::SetProjection(float *p_projectionMatrix)
 
 void Renderer::SetView(float *p_viewMatrix)
 {
-    // TODO
+    for (int i = 0; i < 16; i++)
+    {
+        viewMat.mat[i]= p_viewMatrix[i] ;
+    }
 }
 
 void Renderer::SetModel(float *p_modelMatrix)
 {
-    Mat4 transform = transform.CreateTransformMatrix({rotX, rotY, rotZ}, {transX, transY, transZ}, {scaleX, scaleY, scaleZ});
+   
     for (int i = 0; i < 16; i++)
     {
-        p_modelMatrix[i] = transform.mat[i];
+        modelMat.mat[i]= p_modelMatrix[i] ;
     }
 
     //comm
@@ -167,8 +161,6 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
     }
 }
 
-
-
 //
 void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp, const Vec3 &Normal)
 {
@@ -187,15 +179,28 @@ void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
 
     if (w0 >= 0 && w1 >= 0 && w2 >= 0)
     {
-        w0 /= area;
-        w1 /= area;
-        w2 /= area;
-        if(uniCol)
-        colour = {lineColor[0], lineColor[1], lineColor[2], 1};
-        else
-        colour = {w0,w1,w2,1};
+
+        if (uniCol)
+        {
+            colour = {lineColor[0], lineColor[1], lineColor[2], 1};
+        }
+    else
+        {
+            w0 /= area;
+            w1 /= area;
+            w2 /= area;
+            colour = {w0, w1, w2, 1};
+        }
+        if(isLight)
+        {
 
         DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour * ratio);
+        }
+        else
+        {
+
+        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour );
+        }
     }
 }
 
@@ -269,7 +274,21 @@ void Renderer::DrawQuad(rdrVertex *vertices)
     vert1[2] = vertices[3]; //3;
     DrawTriangle(vert1);
 }
+bool Renderer::OnScreen(const Vec3 coord)
+{
+    if(coord.x < viewport.width+50 && coord.x >-50)
+    {
+        if(coord.y < viewport.height+50 && coord.y >-50)
+    {
+        return true;
+    }
+    }
+    else
+    {
+        return false;
+    }
 
+}
 void Renderer::DrawTriangle(rdrVertex *vertices)
 {
     // Store triangle vertices positions
@@ -278,7 +297,7 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {vertices[1].x, vertices[1].y, vertices[1].z},
         {vertices[2].x, vertices[2].y, vertices[2].z},
     };
-    
+
     // Local space (v3) -> World space (v4)
 
     Vec4 worldCoords[3] = {
@@ -286,33 +305,35 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {Vec4{localCoords[1], 1.f}},
         {Vec4{localCoords[2], 1.f}},
     };
-    Mat4 transform = transform.identity();
+  
 
-    SetModel(transform.mat);
+    worldCoords[0] = modelMat * worldCoords[0];
+    worldCoords[1] = modelMat * worldCoords[1];
+    worldCoords[2] = modelMat * worldCoords[2];
 
-    worldCoords[0] = transform * worldCoords[0];
-    worldCoords[1] = transform * worldCoords[1];
-    worldCoords[2] = transform * worldCoords[2];
+    Vec4 viewCoords[3] = {
+        viewMat * worldCoords[0],
+        viewMat * worldCoords[1],
+        viewMat * worldCoords[2],
+    };
 
     // World space (v4) -> Clip space (v4)
     Vec4 clipCoords[3] = {
-        projMat * worldCoords[0],
-        projMat * worldCoords[1],
-        projMat * worldCoords[2],
+        projMat * viewCoords[0],
+        projMat * viewCoords[1],
+        projMat * viewCoords[2],
     };
 
-
     // Clip space (v4) to NDC (v3)
-    
+
     Vec3 ndcCoords[3] = {
         {clipCoords[0].x / clipCoords[0].w, clipCoords[0].y / clipCoords[0].w, clipCoords[0].z / clipCoords[0].w},
         {clipCoords[1].x / clipCoords[1].w, clipCoords[1].y / clipCoords[1].w, clipCoords[1].z / clipCoords[1].w},
         {clipCoords[2].x / clipCoords[2].w, clipCoords[2].y / clipCoords[2].w, clipCoords[2].z / clipCoords[2].w},
     };
 
-    
     // NDC (v3) to screen coords (v2)
-    
+
     Vec3 screenCoords[3] = {
         {ndcToScreenCoords(ndcCoords[0], viewport)},
         {ndcToScreenCoords(ndcCoords[1], viewport)},
@@ -326,23 +347,28 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
 
     //Get Norm
     Vec3 normal = CrossProduct(ndcCoords[1] - ndcCoords[0], ndcCoords[2] - ndcCoords[0]);
+    
     // Draw triangle wireframe
+    if(OnScreen(screenCoords[0])&& OnScreen(screenCoords[1])&&OnScreen(screenCoords[2]))
+    {
 
-    if (wireframe)
-    {
-        DrawLine(screenCoords[0], screenCoords[1], {lineColor[0],lineColor[1],lineColor[2],1});
-        DrawLine(screenCoords[1], screenCoords[2], {lineColor[0],lineColor[1],lineColor[2],1});
-        DrawLine(screenCoords[0], screenCoords[2], {lineColor[0],lineColor[1],lineColor[2],1});
-    }
-    else
-    {
-        for (int i = iMin; i < iMax; i++)
-        {
-            for (int j = jMin; j < jMax; j++)
-            {
-                BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, (ndcCoords[0].z + ndcCoords[1].z + ndcCoords[2].z) / 3}, viewport, normal);
-            }
-        }
+    
+      if (wireframe)
+      {
+          DrawLine(screenCoords[0], screenCoords[1], {lineColor[0], lineColor[1], lineColor[2], 1});
+          DrawLine(screenCoords[1], screenCoords[2], {lineColor[0], lineColor[1], lineColor[2], 1});
+          DrawLine(screenCoords[0], screenCoords[2], {lineColor[0], lineColor[1], lineColor[2], 1});
+      }
+      else
+      {
+          for (int i = iMin; i < iMax; i++)
+          {
+              for (int j = jMin; j < jMax; j++)
+              {
+                  BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, ndcCoords[0].z }, viewport, normal);
+              }
+          }
+      }
     }
 }
 
@@ -376,18 +402,9 @@ void Renderer::ShowImGuiControls()
     ImGui::ColorEdit4("lineColor", lineColor);
     ImGui::Checkbox("Wireframe", &wireframe);
     ImGui::Checkbox("uniColor", &uniCol);
+    ImGui::Checkbox("Light", &isLight);
 
-    ImGui::SliderFloat("rotX", &rotX, 0, M_PI * 2);
-    ImGui::SliderFloat("rotY", &rotY, 0, M_PI * 2);
-    ImGui::SliderFloat("rotZ", &rotZ, 0, M_PI * 2);
 
-    ImGui::SliderFloat("transX", &transX, 0, M_PI * 2);
-    ImGui::SliderFloat("transY", &transY, 0, M_PI * 2);
-    ImGui::SliderFloat("transZ", &transZ, 0, M_PI * 2);
-
-    ImGui::SliderFloat("scaleX", &scaleX, 0, M_PI * 2);
-    ImGui::SliderFloat("scaleY", &scaleY, 0, M_PI * 2);
-    ImGui::SliderFloat("scaleZ", &scaleZ, 0, M_PI * 2);
 
     ImGui::SliderFloat("posX", &posX, -100, 100);
     ImGui::SliderFloat("posY", &posY, -100, 100);

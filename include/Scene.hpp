@@ -10,7 +10,7 @@ private:
     std::vector<rdrVertex> vertices;
     std::vector<rdrVertex> vertices1;
     std::vector<Light> light;
-
+    Mat4 transform;
     Vec3 *cubeVertice;
 
     float rotX, rotY, rotZ, transX, transY, transZ, scale, scaleX, scaleY, scaleZ;
