@@ -45,6 +45,10 @@ Renderer::Renderer(Framebuffer *f, const uint p_width, const uint p_height) : vi
     scaleX = 0.8;
     scaleY = 0.8;
     scaleZ = 0.8;
+
+    posX = 0.f;
+    posY = 0.f;
+    posZ = -2.f;
 }
 
 Renderer::~Renderer()
@@ -53,7 +57,7 @@ Renderer::~Renderer()
 
 Light::Light()
 {
-    positionLight = {0.f,0.f,0.f};
+    positionLight = {0.f, 0.f, 0.f};
     ambientComponent = 0.2f;
     diffuseComponent = 0.4f;
     specularComponent = 0.4f;
@@ -61,7 +65,6 @@ Light::Light()
 
 Light::~Light()
 {
-
 }
 
 void Renderer::SetProjection(float *p_projectionMatrix)
@@ -174,38 +177,62 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
     }
 }
 
-float Light::GetLightRatio( Vec3 ViewVec, Vec3 NormalVec,Vec3 test)
+float Light::GetLightRatio(Vec3 ViewVec, Vec3 NormalVec, Vec3 pPos)
 {
-    Vec3 ReflectVec = (2 * (positionLight * NormalVec) * NormalVec - positionLight);
-    Vec3 test2 = positionLight - test;
-    Vec3 test3 = ViewVec - test;
-    test2.Normalize();
-    test2 = {1 - test2.x,1 - test2.y,1 - test2.z};
-    test3.Normalize();
-    Vec3 test4 = NormalVec.Normalize();
-    test4 = {1 - test4.x,1 - test4.y,1 - test4.z};
 
-    float ambient = ambientComponent;
-    float diffuse = diffuseComponent * (test2 * NormalVec);
-    float specular = diffuseComponent * (ReflectVec * test3);
+    Vec3 DirLight = (positionLight - pPos);
+    DirLight.Normalize();
+    Vec3 camDir = ViewVec - pPos;
+    camDir.Normalize();
+    camDir.x =fabsf(camDir.x);
+    camDir.y =fabsf(camDir.y);
+    camDir.z =fabsf(camDir.z);
+    
+    NormalVec.Normalize();
+    float diffuse = dot(NormalVec, DirLight);
+ 
+    /* else
+        diffuse = 0; */
+    Vec3 temp = ((NormalVec * 2.f) * dot(NormalVec, DirLight)) - DirLight;
+    temp.Normalize();
 
-    return ambient + diffuse +  specular;
+    float specular = dot(camDir, temp);
+    if (specular > 1)
+    {
+        specular = 1;
+
+        specular = pow(specular, 0.2f * 64.f);
+    }
+
+    specular *= specularComponent;
+    diffuse *= diffuseComponent;
+
+    return specular + diffuse +ambientComponent;
 }
-void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp)
+
+//
+void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp, const Vec3 &Normal)
 {
     float area = edgeVertices(ver1, ver2, ver3);
     float w0 = edgeVertices(ver2, ver3, p);
     float w1 = edgeVertices(ver3, ver1, p);
     float w2 = edgeVertices(ver1, ver2, p);
 
-    Vec3 normal = CrossProduct(ver1-ver3,ver2-ver3);
+    Light light;
+    light.positionLight.x = posX;
+    light.positionLight.y = posY;
+    light.positionLight.z = posZ;
+    Vec4 colour;
+
+    float ratio = light.GetLightRatio({0.f, 0.f, 0.f}, {Normal}, p);
+
     if (w0 >= 0 && w1 >= 0 && w2 >= 0)
     {
-        Light light;
         w0 /= area;
         w1 /= area;
         w2 /= area;
-        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, {w0, w1, w2, light.GetLightRatio({0.f,0.f,0.f},{normal},p)});
+        colour = {0, 0, 1, 1};
+        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour * ratio);
     }
 }
 
@@ -223,7 +250,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
 
     for (;;)
     { /* pixel loop */
-        if (y0 > 0 && y0 < viewport.width * viewport.height  && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height&& viewport.height * y0 < viewport.width * viewport.height)
+        if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height && viewport.height * y0 < viewport.width * viewport.height)
         {
             DrawPixel(800, 600, x0, y0, p0.z, {color.x, color.y, color.z, color.w});
         }
@@ -234,7 +261,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(x0) == roundf(x1))
                 break;
             if (e2 + dy < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height  && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height&& viewport.height * y0 < viewport.width * viewport.height)
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height && viewport.height * y0 < viewport.width * viewport.height)
                 {
                     DrawPixel(800, 600, x0, y0 + sy, p0.z, {color.x, color.y, color.z, color.w});
                 }
@@ -246,7 +273,7 @@ void Renderer::DrawLine(const Vec3 &p0, const Vec3 &p1, const Vec4 &color)
             if (roundf(y0) == roundf(y1))
                 break;
             if (dx - e2 < ed)
-                if (y0 > 0 && y0 < viewport.width * viewport.height  && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height&& viewport.height * y0 < viewport.width * viewport.height)
+                if (y0 > 0 && y0 < viewport.width * viewport.height && x0 > 0 && viewport.width * y0 < viewport.width * viewport.height && viewport.height * y0 < viewport.width * viewport.height)
                 {
                     DrawPixel(800, 600, x2 + sx, y0, p0.z, {color.x, color.y, color.z, color.w});
                 }
@@ -269,14 +296,14 @@ void Renderer::DrawQuad(rdrVertex *vertices)
 {
     rdrVertex vert1[3];
 
-    vert1[0] = vertices[0];
-    vert1[1] = vertices[1];
-    vert1[2] = vertices[3];
+    vert1[0] = vertices[2]; //2
+    vert1[1] = vertices[0]; //0
+    vert1[2] = vertices[1]; //1
     DrawTriangle(vert1);
 
-    vert1[0] = vertices[2];
-    vert1[1] = vertices[3];
-    vert1[2] = vertices[1];
+    vert1[0] = vertices[0]; //2;
+    vert1[1] = vertices[2]; //0;
+    vert1[2] = vertices[3]; //3;
     DrawTriangle(vert1);
 }
 
@@ -288,7 +315,7 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {vertices[1].x, vertices[1].y, vertices[1].z},
         {vertices[2].x, vertices[2].y, vertices[2].z},
     };
-
+    
     // Local space (v3) -> Clip space (v4)
 
     Vec4 clipCoords[3] = {
@@ -307,16 +334,15 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
     clipCoords[0] = projMat * clipCoords[0];
     clipCoords[1] = projMat * clipCoords[1];
     clipCoords[2] = projMat * clipCoords[2];
-    
 
-        // Clip space (v4) to NDC (v3)
-        // TODO
-        Vec3 ndcCoords[3] = {
+    // Clip space (v4) to NDC (v3)
+    // TODO
+    Vec3 ndcCoords[3] = {
         {clipCoords[0].x / clipCoords[0].w, clipCoords[0].y / clipCoords[0].w, clipCoords[0].z / clipCoords[0].w},
         {clipCoords[1].x / clipCoords[1].w, clipCoords[1].y / clipCoords[1].w, clipCoords[1].z / clipCoords[1].w},
         {clipCoords[2].x / clipCoords[2].w, clipCoords[2].y / clipCoords[2].w, clipCoords[2].z / clipCoords[2].w},
     };
-
+    Vec3 normal = CrossProduct(ndcCoords[1] - ndcCoords[0], ndcCoords[2] - ndcCoords[0]);
     // NDC (v3) to screen coords (v2)
     // TODO
     Vec3 screenCoords[3] = {
@@ -343,7 +369,7 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {
             for (int j = jMin; j < jMax; j++)
             {
-                BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, (ndcCoords[0].z+ndcCoords[1].z+ndcCoords[2].z)/3}, viewport);
+                BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, (ndcCoords[0].z + ndcCoords[1].z + ndcCoords[2].z) / 3}, viewport, normal);
             }
         }
     }
@@ -389,4 +415,8 @@ void Renderer::ShowImGuiControls()
     ImGui::SliderFloat("scaleX", &scaleX, 0, M_PI * 2);
     ImGui::SliderFloat("scaleY", &scaleY, 0, M_PI * 2);
     ImGui::SliderFloat("scaleZ", &scaleZ, 0, M_PI * 2);
+
+    ImGui::SliderFloat("posX", &posX, -100, 100);
+    ImGui::SliderFloat("posY", &posY, -100, 100);
+    ImGui::SliderFloat("posZ", &posZ, -100, 100);
 }

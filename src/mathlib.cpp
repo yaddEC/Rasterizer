@@ -25,39 +25,48 @@ Vec3 Vec3::Normalize()
     x = x / GetMagnitude();
     y = y / GetMagnitude();
     z = z / GetMagnitude();
-    return {x,y,z};
+    return {x, y, z};
 }
 
-Vec3 operator+(const Vec3 &a,const Vec3&b)
+Vec3 operator+(const Vec3 &a, const Vec3 &b)
 {
     return {a.x + b.x, a.y + b.y, a.z + b.z};
 }
 
-Vec3 operator*(const float &a,const Vec3 &b)
+Vec3 operator*(const float &a, const Vec3 &b)
 {
     return {b.x * a, b.y * a, b.z * a};
 }
 
-Vec3 operator*(const Vec3 &b,const float &a)
+Vec3 operator*(const Vec3 &b, const float &a)
 {
     return {b.x * a, b.y * a, b.z * a};
 }
 
-float operator*(const Vec3 &a,const Vec3 &b)
+float operator*(const Vec3 &a, const Vec3 &b)
 {
-    return (b.x * a.x)+(b.y * a.y)+(b.z * a.z);
+    return (b.x * a.x) + (b.y * a.y) + (b.z * a.z);
 }
 
-Vec3 operator-(const Vec3 &a,const Vec3 &b)
+float dot(const Vec3 &a, const Vec3 &b)
 {
-    return {a.x - b.x,a.y - b.y,a.z - b.z};
+    return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-Vec3 CrossProduct(const Vec3 &a,const Vec3 &b)
+Vec3 operator-(const Vec3 &a, const Vec3 &b)
 {
-    return {a.x*b.x,a.y*b.y,a.z*b.z};
+    return {a.x - b.x, a.y - b.y, a.z - b.z};
 }
 
+Vec3 CrossProduct(const Vec3 &a, const Vec3 &b)
+{
+    float x2, y2, z2;
+
+    x2 = b.z * a.y - b.y * a.z;
+    y2 = b.x * a.z - b.z * a.x;
+    z2 = b.y * a.x - b.x * a.y;
+    return {x2, y2, z2};
+}
 
 Vec3::~Vec3()
 {
@@ -106,8 +115,8 @@ Vec3 Vec4::GetHomogenize()
         y = y / w;
         z = z / w;
     }
-    result = {x,y,z};
-    return(result);
+    result = {x, y, z};
+    return (result);
 }
 
 void Vec4::Print()
@@ -171,14 +180,25 @@ void Mat4::Print()
 }
 Mat4 Mat4::identity()
 {
-    float array[16]
-    ={
-         
-        1.f, 0.f, 0.f, 0.f,
-        0.f, 1.f, 0.f, 0.f,
-        0.f, 0.f, 1.f, 0.f,
-        0.f, 0.f, 0.f, 1.f,
-        
+    float array[16] = {
+
+        1.f,
+        0.f,
+        0.f,
+        0.f,
+        0.f,
+        1.f,
+        0.f,
+        0.f,
+        0.f,
+        0.f,
+        1.f,
+        0.f,
+        0.f,
+        0.f,
+        0.f,
+        1.f,
+
     };
 
     Mat4 temp = array;
@@ -247,7 +267,7 @@ Mat4 Mat4::CreateScaleMatrix(const Vec3 &scale)
             0, scale.y, 0, 0,
             0, 0, scale.z, 0,
             0, 0, 0, 1};
-    Mat4 temp = array;  
+    Mat4 temp = array;
     return temp;
 }
 Mat4::Mat4(float a, float b, float c, float d, float e, float f, float g, float h, float i, float j, float k, float l, float m, float n, float o, float p)
@@ -295,7 +315,7 @@ Mat4 Mat4::CreateZRotationMatrix(float angle)
 }
 Mat4 Mat4::CreateTransformMatrix(const Vec3 &rotation, const Vec3 &position, const Vec3 &scale)
 {
-   /*   float array[16] = 
+    /*   float array[16] = 
     {
         scale.x * cosf(rotation.y)*cosf(rotation.z),-sinf(rotation.z),sinf(rotation.z),position.x,
         sinf(rotation.z),scale.y*cosf(rotation.x)*cosf(rotation.x),-sinf(rotation.z),position.y,
@@ -304,7 +324,7 @@ Mat4 Mat4::CreateTransformMatrix(const Vec3 &rotation, const Vec3 &position, con
     };
     Mat4 temp = array;
     return  temp ; */
-    return  CreateTranslationMatrix(position)* (CreateYRotationMatrix(rotation.y)*CreateXRotationMatrix(rotation.x)  * CreateZRotationMatrix(rotation.z)) * CreateScaleMatrix(scale) ;
+    return CreateTranslationMatrix(position) * (CreateYRotationMatrix(rotation.y) * CreateXRotationMatrix(rotation.x) * CreateZRotationMatrix(rotation.z)) * CreateScaleMatrix(scale);
 }
 
 void Mat4::TransposeMatrix(const int M, const int N)

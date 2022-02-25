@@ -54,11 +54,6 @@ void Scene::DrawSphere(const int lon, const int lat, const float& radius, Vec3 t
             vertices[2].SetPosition(c2.x,c2.y,c2.z);
             vertices[3].SetPosition(c3.x,c3.y,c3.z);
 
-            vertices[0].SetColor(0.5f,0,0,0);
-            vertices[1].SetColor(1.0f,0.2f,0,0);
-            vertices[2].SetColor(1.0f,0,1.0f,0);
-            vertices[3].SetColor(0,0,0,0);
-
             renderer.DrawQuads(vertices,1);
 
         }
@@ -125,7 +120,7 @@ void Scene::Update(float deltaTime, Renderer &renderer)
 
     // Draw
 
-    DrawSphere(10,13,1,{0.5, 0, 1},renderer);
+    DrawSphere(30,30,1,{0.5, 0, 1},renderer);
     renderer.DrawQuads(vertices1.data(), (int)vertices1.size());
     if (isExo1)
         renderer.DrawTriangles(vertices.data(), (int)vertices.size());

@@ -9,12 +9,12 @@ public:
     float x;
     float y;
     float z;
-
+    
     float GetMagnitude();
     Vec3 Normalize();
     ~Vec3();
 };
-
+float dot(const Vec3 &a,const Vec3 &b);
 float operator*(const Vec3 &a,const Vec3 &b);
 Vec3 operator-(const Vec3 &a,const Vec3 &b);
 Vec3 operator*(const Vec3 &b,const float &a);

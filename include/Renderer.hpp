@@ -46,13 +46,13 @@ class Renderer
 private:
     Framebuffer* fb;
     float *Zbuffer;
-    float rotX,rotY,rotZ,transX,transY,transZ,scaleX,scaleY,scaleZ;
     Viewport viewport;
     Vec4 lineColor = {0,255,0,0.2};
     Mat4 projMat;
     bool wireframe=false;
 
 public:
+    float rotX,rotY,rotZ,transX,transY,transZ,scaleX,scaleY,scaleZ,posX,posY,posZ;
 // Color and depth buffer have to be valid until the shutdown of the renderer
 // Color buffer is RGBA, each component is a 32 bits float
 // Depth buffer is a buffer of 32bits floats
@@ -70,7 +70,7 @@ public:
     void DrawTriangles(rdrVertex* p_vertices, const uint p_count);
     void DrawQuads(rdrVertex* p_vertices, const uint p_count );
     void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y,const float p_z, Vec4 p_color);
-    void BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp);
+    void BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp, const Vec3 &Normal);
     
     void ShowImGuiControls();
 
