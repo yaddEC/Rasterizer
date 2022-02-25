@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <Renderer.hpp>
+#include <Light.hpp>
 
 class Scene
 {

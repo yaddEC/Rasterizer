@@ -7,6 +7,7 @@
 #include <maths.hpp>
 
 #include <Renderer.hpp>
+#include <Light.hpp>
 
 void rdrVertex::SetColor(float a1, float b1, float c1, float d1)
 {
@@ -55,17 +56,6 @@ Renderer::~Renderer()
 {
 }
 
-Light::Light()
-{
-    positionLight = {0.f, 0.f, 0.f};
-    ambientComponent = 0.2f;
-    diffuseComponent = 0.4f;
-    specularComponent = 0.4f;
-}
-
-Light::~Light()
-{
-}
 
 void Renderer::SetProjection(float *p_projectionMatrix)
 {
@@ -177,38 +167,7 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
     }
 }
 
-float Light::GetLightRatio(Vec3 ViewVec, Vec3 NormalVec, Vec3 pPos)
-{
 
-    Vec3 DirLight = (positionLight - pPos);
-    DirLight.Normalize();
-    Vec3 camDir = ViewVec - pPos;
-    camDir.Normalize();
-    camDir.x =fabsf(camDir.x);
-    camDir.y =fabsf(camDir.y);
-    camDir.z =fabsf(camDir.z);
-    
-    NormalVec.Normalize();
-    float diffuse = dot(NormalVec, DirLight);
- 
-    /* else
-        diffuse = 0; */
-    Vec3 temp = ((NormalVec * 2.f) * dot(NormalVec, DirLight)) - DirLight;
-    temp.Normalize();
-
-    float specular = dot(camDir, temp);
-    if (specular > 1)
-    {
-        specular = 1;
-
-        specular = pow(specular, 0.2f * 64.f);
-    }
-
-    specular *= specularComponent;
-    diffuse *= diffuseComponent;
-
-    return specular + diffuse +ambientComponent;
-}
 
 //
 void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp, const Vec3 &Normal)
