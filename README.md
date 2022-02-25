@@ -14,4 +14,9 @@ make
 
 <h3 align="center"><img src = include/tgdfg.png></h3>
 
-## You can right click to activate the camera and press space to get out
+You can right click to activate the camera and press space to get out
+
+## Difficulties:
+
+Most problems came frome the code understanding and how 3d space work with math. It was a difficult project most function were time consuming to implement.
+The lag of a code not working make it difficult to debbug and understand the problems. It was a bit of a blind search.
