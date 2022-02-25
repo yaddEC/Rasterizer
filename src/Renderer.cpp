@@ -290,7 +290,7 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
     worldCoords[1] = transform * worldCoords[1];
     worldCoords[2] = transform * worldCoords[2];
 
-     // World space (v4) -> Clip space (v4)
+    // World space (v4) -> Clip space (v4)
     Vec4 clipCoords[3] = {
         projMat * worldCoords[0],
         projMat * worldCoords[1],
