@@ -10,14 +10,8 @@ make
 ```sh
 ./Rasterizer
 ```
-## To View the barycentric color triangle check the Exo 1 box:
+## Diagrame of the project control:
 
-<h3 align="center"><img src = include/exo1.png></h3>
+<h3 align="center"><img src = include/tgdfg.png></h3>
 
-## To view the scene with wireframed object check the Wireframe box:
-
-<h3 align="center"><img src = include/wireframe.png></h3>
-
-## You can use sliders to move the scene as you like:
-
-<h3 align="center"><img src = include/sliders.png></h3>
+## You can right click to activate the camera and press space to get out
