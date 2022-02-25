@@ -275,9 +275,9 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {vertices[2].x, vertices[2].y, vertices[2].z},
     };
     
-    // Local space (v3) -> Clip space (v4)
+    // Local space (v3) -> World space (v4)
 
-    Vec4 clipCoords[3] = {
+    Vec4 worldCoords[3] = {
         {Vec4{localCoords[0], 1.f}},
         {Vec4{localCoords[1], 1.f}},
         {Vec4{localCoords[2], 1.f}},
@@ -286,34 +286,42 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
 
     SetModel(transform.mat);
 
-    clipCoords[0] = transform * clipCoords[0];
-    clipCoords[1] = transform * clipCoords[1];
-    clipCoords[2] = transform * clipCoords[2];
+    worldCoords[0] = transform * worldCoords[0];
+    worldCoords[1] = transform * worldCoords[1];
+    worldCoords[2] = transform * worldCoords[2];
 
-    clipCoords[0] = projMat * clipCoords[0];
-    clipCoords[1] = projMat * clipCoords[1];
-    clipCoords[2] = projMat * clipCoords[2];
+     // World space (v4) -> Clip space (v4)
+    Vec4 clipCoords[3] = {
+        projMat * worldCoords[0],
+        projMat * worldCoords[1],
+        projMat * worldCoords[2],
+    };
+
 
     // Clip space (v4) to NDC (v3)
-    // TODO
+    
     Vec3 ndcCoords[3] = {
         {clipCoords[0].x / clipCoords[0].w, clipCoords[0].y / clipCoords[0].w, clipCoords[0].z / clipCoords[0].w},
         {clipCoords[1].x / clipCoords[1].w, clipCoords[1].y / clipCoords[1].w, clipCoords[1].z / clipCoords[1].w},
         {clipCoords[2].x / clipCoords[2].w, clipCoords[2].y / clipCoords[2].w, clipCoords[2].z / clipCoords[2].w},
     };
-    Vec3 normal = CrossProduct(ndcCoords[1] - ndcCoords[0], ndcCoords[2] - ndcCoords[0]);
+
+    
     // NDC (v3) to screen coords (v2)
-    // TODO
+    
     Vec3 screenCoords[3] = {
         {ndcToScreenCoords(ndcCoords[0], viewport)},
         {ndcToScreenCoords(ndcCoords[1], viewport)},
         {ndcToScreenCoords(ndcCoords[2], viewport)},
     };
+    //Get Bounding box
     int iMin = (int)GetMin(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
     int iMax = (int)GetMax(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
     int jMin = (int)GetMin(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
     int jMax = (int)GetMax(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
 
+    //Get Norm
+    Vec3 normal = CrossProduct(ndcCoords[1] - ndcCoords[0], ndcCoords[2] - ndcCoords[0]);
     // Draw triangle wireframe
 
     if (wireframe)

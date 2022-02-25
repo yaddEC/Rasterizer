@@ -48,10 +48,10 @@ int main(int argc, char* argv[])
     case EAppState::GLFWFAILED:
     case EAppState::WINDOWFAILED:
     case EAppState::GLADFAILED:
-        printf("Y a eu un soucis\n");
+        printf("ALERTE ALERTE ERREUR CELA NE FONCTIONNE POINT\n");
         break;
     case EAppState::SUCCESS:
-        printf("ça fonctionne\n");
+        printf("TOUT MARCHE COMME SUR DES ROULETTES\n");
         break;
     default:
         break;
