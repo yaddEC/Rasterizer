@@ -64,7 +64,7 @@ public:
     void DrawTriangles(rdrVertex* p_vertices, const uint p_count);
     void DrawQuads(rdrVertex* p_vertices, const uint p_count );
     void DrawPixel(uint p_width, uint p_height, uint p_x, uint p_y,const float p_z, Vec4 p_color);
-    void BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp, const Vec3 &Normal);
+    void BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, float iMin, float iMax, float jMin, float jMax, float z, const Viewport vp, const Vec3 &Normal);
     
     void ShowImGuiControls();
 

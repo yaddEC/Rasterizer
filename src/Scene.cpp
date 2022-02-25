@@ -118,10 +118,7 @@ Scene::~Scene()
 
 void Scene::Update(float deltaTime, Renderer &renderer)
 {
-    // HERE: Update (if needed) and display the scene
-
-    // Hard coded matrix
-    // TODO: Remove this and use proper functions !
+  
 
     // Draw
     transform = transform.CreateTransformMatrix({rotX, rotY, rotZ}, {transX, transY, transZ}, {scaleX, scaleY, scaleZ});

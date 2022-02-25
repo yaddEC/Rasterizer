@@ -38,7 +38,6 @@ Renderer::Renderer(Framebuffer *f, const uint p_width, const uint p_height) : vi
     fb = f;
     Zbuffer = fb->GetDepthBuffer();
 
-
     posX = 0.f;
     posY = 0.f;
     posZ = -2.f;
@@ -61,16 +60,16 @@ void Renderer::SetView(float *p_viewMatrix)
 {
     for (int i = 0; i < 16; i++)
     {
-        viewMat.mat[i]= p_viewMatrix[i] ;
+        viewMat.mat[i] = p_viewMatrix[i];
     }
 }
 
 void Renderer::SetModel(float *p_modelMatrix)
 {
-   
+
     for (int i = 0; i < 16; i++)
     {
-        modelMat.mat[i]= p_modelMatrix[i] ;
+        modelMat.mat[i] = p_modelMatrix[i];
     }
 
     //comm
@@ -86,7 +85,7 @@ void Renderer::SetTexture(float *p_colors32Bits, const uint p_width, const uint 
     // TODO
 }
 
-float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
+inline float edgeVertices(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3)
 {
     float temp;
     temp = (ver3.x - ver1.x) * (ver2.y - ver1.y) - (ver3.y - ver1.y) * (ver2.x - ver1.x);
@@ -162,44 +161,48 @@ void Renderer::DrawPixel(const uint p_width, const uint p_height, const uint p_x
 }
 
 //
-void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, const Vec3 &p, const Viewport vp, const Vec3 &Normal)
+void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver3, float iMin, float iMax, float jMin, float jMax, float z, const Viewport vp, const Vec3 &Normal)
 {
     float area = edgeVertices(ver1, ver2, ver3);
-    float w0 = edgeVertices(ver2, ver3, p);
-    float w1 = edgeVertices(ver3, ver1, p);
-    float w2 = edgeVertices(ver1, ver2, p);
-
-    Light light;
-    light.positionLight.x = posX;
-    light.positionLight.y = posY;
-    light.positionLight.z = posZ;
-    Vec4 colour;
-
-    float ratio = light.GetLightRatio({0.f, 0.f, 0.f}, {Normal}, p);
-
-    if (w0 >= 0 && w1 >= 0 && w2 >= 0)
+    for (int i = iMin; i < iMax; i++)
     {
+        for (int j = jMin; j < jMax; j++)
+        {
+            Vec3 p = {i, j, z};
+            float w0 = edgeVertices(ver2, ver3, p);
+            float w1 = edgeVertices(ver3, ver1, p);
+            float w2 = edgeVertices(ver1, ver2, p);
 
-        if (uniCol)
-        {
-            colour = {lineColor[0], lineColor[1], lineColor[2], 1};
-        }
-    else
-        {
-            w0 /= area;
-            w1 /= area;
-            w2 /= area;
-            colour = {w0, w1, w2, 1};
-        }
-        if(isLight)
-        {
+            Light light;
 
-        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour * ratio);
-        }
-        else
-        {
+            Vec4 colour;
 
-        DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour );
+            if (w0 >= 0 && w1 >= 0 && w2 >= 0)
+            {
+
+                if (uniCol)
+                {
+                    colour = {0, 0, 1, 1};
+                }
+                else
+                {
+                    w0 /= area;
+                    w1 /= area;
+                    w2 /= area;
+                    colour = {w0, w1, w2, 1};
+                }
+                if (isLight)
+                {
+
+                    float ratio = light.GetLightRatio({0.f, 0.f, 0.f}, {Normal}, p);
+                    DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour * ratio);
+                }
+                else
+                {
+
+                    DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour);
+                }
+            }
         }
     }
 }
@@ -276,18 +279,17 @@ void Renderer::DrawQuad(rdrVertex *vertices)
 }
 bool Renderer::OnScreen(const Vec3 coord)
 {
-    if(coord.x < viewport.width+50 && coord.x >-50)
+    if (coord.x < viewport.width + 50 && coord.x > -50)
     {
-        if(coord.y < viewport.height+50 && coord.y >-50)
-    {
-        return true;
-    }
+        if (coord.y < viewport.height + 50 && coord.y > -50)
+        {
+            return true;
+        }
     }
     else
     {
         return false;
     }
-
 }
 void Renderer::DrawTriangle(rdrVertex *vertices)
 {
@@ -305,7 +307,6 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
         {Vec4{localCoords[1], 1.f}},
         {Vec4{localCoords[2], 1.f}},
     };
-  
 
     worldCoords[0] = modelMat * worldCoords[0];
     worldCoords[1] = modelMat * worldCoords[1];
@@ -318,57 +319,54 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
     };
 
     // World space (v4) -> Clip space (v4)
-    Vec4 clipCoords[3] = {
-        projMat * viewCoords[0],
-        projMat * viewCoords[1],
-        projMat * viewCoords[2],
-    };
-
-    // Clip space (v4) to NDC (v3)
-
-    Vec3 ndcCoords[3] = {
-        {clipCoords[0].x / clipCoords[0].w, clipCoords[0].y / clipCoords[0].w, clipCoords[0].z / clipCoords[0].w},
-        {clipCoords[1].x / clipCoords[1].w, clipCoords[1].y / clipCoords[1].w, clipCoords[1].z / clipCoords[1].w},
-        {clipCoords[2].x / clipCoords[2].w, clipCoords[2].y / clipCoords[2].w, clipCoords[2].z / clipCoords[2].w},
-    };
-
-    // NDC (v3) to screen coords (v2)
-
-    Vec3 screenCoords[3] = {
-        {ndcToScreenCoords(ndcCoords[0], viewport)},
-        {ndcToScreenCoords(ndcCoords[1], viewport)},
-        {ndcToScreenCoords(ndcCoords[2], viewport)},
-    };
-    //Get Bounding box
-    int iMin = (int)GetMin(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
-    int iMax = (int)GetMax(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
-    int jMin = (int)GetMin(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
-    int jMax = (int)GetMax(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
-
-    //Get Norm
-    Vec3 normal = CrossProduct(ndcCoords[1] - ndcCoords[0], ndcCoords[2] - ndcCoords[0]);
-    
-    // Draw triangle wireframe
-    if(OnScreen(screenCoords[0])&& OnScreen(screenCoords[1])&&OnScreen(screenCoords[2]))
+    if (viewCoords[0].z > 0 && viewCoords[1].z > 0 && viewCoords[2].z > 0)
     {
+        Vec4 clipCoords[3] = {
+            projMat * viewCoords[0],
+            projMat * viewCoords[1],
+            projMat * viewCoords[2],
+        };
 
-    
-      if (wireframe)
-      {
-          DrawLine(screenCoords[0], screenCoords[1], {lineColor[0], lineColor[1], lineColor[2], 1});
-          DrawLine(screenCoords[1], screenCoords[2], {lineColor[0], lineColor[1], lineColor[2], 1});
-          DrawLine(screenCoords[0], screenCoords[2], {lineColor[0], lineColor[1], lineColor[2], 1});
-      }
-      else
-      {
-          for (int i = iMin; i < iMax; i++)
-          {
-              for (int j = jMin; j < jMax; j++)
-              {
-                  BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, ndcCoords[0].z }, viewport, normal);
-              }
-          }
-      }
+        // Clip space (v4) to NDC (v3)
+
+        Vec3 ndcCoords[3] = {
+            {clipCoords[0].x / clipCoords[0].w, clipCoords[0].y / clipCoords[0].w, clipCoords[0].z / clipCoords[0].w},
+            {clipCoords[1].x / clipCoords[1].w, clipCoords[1].y / clipCoords[1].w, clipCoords[1].z / clipCoords[1].w},
+            {clipCoords[2].x / clipCoords[2].w, clipCoords[2].y / clipCoords[2].w, clipCoords[2].z / clipCoords[2].w},
+        };
+
+        // NDC (v3) to screen coords (v2)
+
+        Vec3 screenCoords[3] = {
+            {ndcToScreenCoords(ndcCoords[0], viewport)},
+            {ndcToScreenCoords(ndcCoords[1], viewport)},
+            {ndcToScreenCoords(ndcCoords[2], viewport)},
+        };
+        //Get Bounding box
+        int iMin = (int)GetMin(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
+        int iMax = (int)GetMax(screenCoords[0].x, screenCoords[1].x, screenCoords[2].x);
+        int jMin = (int)GetMin(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
+        int jMax = (int)GetMax(screenCoords[0].y, screenCoords[1].y, screenCoords[2].y);
+
+        //Get Norm
+        Vec3 normal = CrossProduct(ndcCoords[1] - ndcCoords[0], ndcCoords[2] - ndcCoords[0]);
+
+        // Draw triangle wireframe
+        if (OnScreen(screenCoords[0]) && OnScreen(screenCoords[1]) && OnScreen(screenCoords[2]))
+        {
+
+            if (wireframe)
+            {
+                DrawLine(screenCoords[0], screenCoords[1], {lineColor[0], lineColor[1], lineColor[2], 1});
+                DrawLine(screenCoords[1], screenCoords[2], {lineColor[0], lineColor[1], lineColor[2], 1});
+                DrawLine(screenCoords[0], screenCoords[2], {lineColor[0], lineColor[1], lineColor[2], 1});
+            }
+            else
+            {
+
+                BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], iMin, iMax, jMin, jMax, (ndcCoords[0].z + ndcCoords[1].z + ndcCoords[2].z) / 3, viewport, normal);
+            }
+        }
     }
 }
 
@@ -403,8 +401,6 @@ void Renderer::ShowImGuiControls()
     ImGui::Checkbox("Wireframe", &wireframe);
     ImGui::Checkbox("uniColor", &uniCol);
     ImGui::Checkbox("Light", &isLight);
-
-
 
     ImGui::SliderFloat("posX", &posX, -100, 100);
     ImGui::SliderFloat("posY", &posY, -100, 100);

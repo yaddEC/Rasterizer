@@ -24,9 +24,9 @@ float Light::GetLightRatio(Vec3 ViewVec, Vec3 NormalVec, Vec3 pPos)
     DirLight.Normalize();
     Vec3 camDir = ViewVec - pPos;
     camDir.Normalize();
-    camDir.x =fabsf(camDir.x);
-    camDir.y =fabsf(camDir.y);
-    camDir.z =fabsf(camDir.z);
+    camDir.x =fabs(camDir.x);
+    camDir.y =fabs(camDir.y);
+    camDir.z =fabs(camDir.z);
     
     NormalVec.Normalize();
     float diffuse = dot(NormalVec, DirLight);

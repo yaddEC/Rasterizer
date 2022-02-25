@@ -3260,7 +3260,7 @@ static void ShowDemoWindowPopups()
 
     // The properties of popups windows are:
     // - They block normal mouse hovering detection outside them. (*)
-    // - Unless modal, they can be closed by clicking anywhere outside them, or by pressing ESCAPE.
+    // - Unless modal, they can be closed by clicking anywhere outside them, or by pressing SPACE.
     // - Their visibility state (~bool) is held internally by Dear ImGui instead of being held by the programmer as
     //   we are used to with regular Begin() calls. User can manipulate the visibility state by calling OpenPopup().
     // (*) One can use IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup) to bypass it and detect hovering even

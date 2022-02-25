@@ -176,7 +176,7 @@ void App::Update()
         ImGui::End();
 
         ImGui::Begin("Framebuffer");
-        ImGui::Text("(Right click to capture mouse, Esc to un-capture)");
+        ImGui::Text("(Right click to capture mouse, SPACE to un-capture)");
         // Display framebuffer (renderer output)
         ImGui::Image((ImTextureID)(size_t)framebuffer.GetColorTexture(), { (float)framebuffer.GetWidth(), (float)framebuffer.GetHeight() });
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
