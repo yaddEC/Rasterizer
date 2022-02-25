@@ -332,9 +332,9 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
     }
     else
     {
-        for (int i = iMin; i < iMax; i++)
+        for (float i = iMin; i < iMax; i++)
         {
-            for (int j = jMin; j < jMax; j++)
+            for (float j = jMin; j < jMax; j++)
             {
                 BarycenterGen(screenCoords[0], screenCoords[1], screenCoords[2], {i, j, (ndcCoords[0].z + ndcCoords[1].z + ndcCoords[2].z) / 3}, viewport, normal);
             }
