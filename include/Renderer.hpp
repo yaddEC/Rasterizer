@@ -35,9 +35,12 @@ private:
     Framebuffer* fb;
     float *Zbuffer;
     Viewport viewport;
-    Vec4 lineColor = {0,255,0,0.2};
+    float lineColor[4] = {0,255,0,0.2};
+    
     Mat4 projMat;
+
     bool wireframe=false;
+    bool uniCol=true;
 
 public:
     float rotX,rotY,rotZ,transX,transY,transZ,scaleX,scaleY,scaleZ,posX,posY,posZ;

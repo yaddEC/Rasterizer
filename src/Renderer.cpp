@@ -190,7 +190,11 @@ void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
         w0 /= area;
         w1 /= area;
         w2 /= area;
-        colour = {0, 0, 1, 1};
+        if(uniCol)
+        colour = {lineColor[0], lineColor[1], lineColor[2], 1};
+        else
+        colour = {w0,w1,w2,1};
+
         DrawPixel(vp.width, vp.height, p.x, p.y, p.z, colour * ratio);
     }
 }
@@ -326,9 +330,9 @@ void Renderer::DrawTriangle(rdrVertex *vertices)
 
     if (wireframe)
     {
-        DrawLine(screenCoords[0], screenCoords[1], lineColor);
-        DrawLine(screenCoords[1], screenCoords[2], lineColor);
-        DrawLine(screenCoords[0], screenCoords[2], lineColor);
+        DrawLine(screenCoords[0], screenCoords[1], {lineColor[0],lineColor[1],lineColor[2],1});
+        DrawLine(screenCoords[1], screenCoords[2], {lineColor[0],lineColor[1],lineColor[2],1});
+        DrawLine(screenCoords[0], screenCoords[2], {lineColor[0],lineColor[1],lineColor[2],1});
     }
     else
     {
@@ -369,8 +373,10 @@ void rdrSetImGuiContext(rdrImpl* renderer, struct ImGuiContext* context)
 
 void Renderer::ShowImGuiControls()
 {
-    ImGui::ColorEdit4("lineColor", &lineColor.x);
+    ImGui::ColorEdit4("lineColor", lineColor);
     ImGui::Checkbox("Wireframe", &wireframe);
+    ImGui::Checkbox("uniColor", &uniCol);
+
     ImGui::SliderFloat("rotX", &rotX, 0, M_PI * 2);
     ImGui::SliderFloat("rotY", &rotY, 0, M_PI * 2);
     ImGui::SliderFloat("rotZ", &rotZ, 0, M_PI * 2);
