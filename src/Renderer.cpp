@@ -182,7 +182,7 @@ void Renderer::BarycenterGen(const Vec3 &ver1, const Vec3 &ver2, const Vec3 &ver
 
                 if (uniCol)
                 {
-                    colour = {0, 0, 1, 1};
+                    colour = {lineColor[0], lineColor[1], lineColor[2], 1};
                 }
                 else
                 {
